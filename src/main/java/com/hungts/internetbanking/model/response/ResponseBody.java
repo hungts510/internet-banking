@@ -28,6 +28,12 @@ public class ResponseBody<T> {
         this.message = message;
     }
 
+    public ResponseBody(int resultCode, String message, T data) {
+        this.code = resultCode;
+        this.message = message;
+        this.data = data;
+    }
+
     public void setResultCode(ResultCode resultCode) {
         this.code = resultCode.getCode();
         this.message = resultCode.getMessage();
