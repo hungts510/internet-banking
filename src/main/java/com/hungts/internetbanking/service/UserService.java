@@ -8,4 +8,6 @@ public interface UserService {
     void createUser(UserRequest userRequest) throws EzException;
     
     UserInfo findUserByEmail(UserRequest userRequest) throws EzException;
+
+    UserInfo findUserByPhoneNumber(UserRequest userRequest) throws EzException;
 }

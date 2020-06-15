@@ -9,9 +9,12 @@ import org.springframework.stereotype.Repository;
 @Mapper
 @Repository
 public interface UserRepository {
-    @Insert("INSERT INTO user(fullname, email, phone) VALUES(#{fullName}, #{email}, #{phone})")
-    void insertUser(String fullName, String email, String phone);
+    @Insert("INSERT INTO user(fullname, email, phone, password) VALUES(#{fullName}, #{email}, #{phone}, #{password})")
+    void insertUser(String fullName, String email, String phone, String password);
 
     @Select("SELECT * FROM user WHERE email = #{email}")
     User getUserByEmail(String email);
+
+    @Select("SELECT * FROM user WHERE phone = #{phone}")
+    User getUserByPhoneNumber(String phone);
 }

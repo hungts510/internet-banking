@@ -7,6 +7,7 @@ import com.hungts.internetbanking.model.info.UserInfo;
 import com.hungts.internetbanking.repository.UserRepository;
 import com.hungts.internetbanking.model.request.UserRequest;
 import com.hungts.internetbanking.service.UserService;
+import com.hungts.internetbanking.util.EncryptPasswordUtils;
 import com.hungts.internetbanking.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,14 +22,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void createUser(UserRequest userRequest) throws EzException {
-        if (Utils.isEmpty(userRequest.getFullname()) || Utils.isEmpty(userRequest.getEmail()) || Utils.isEmpty(userRequest.getPhone())) {
+        if (Utils.isEmpty(userRequest.getFullname()) || Utils.isEmpty(userRequest.getEmail())
+                || Utils.isEmpty(userRequest.getPhone()) || Utils.isEmpty(userRequest.getPassword())) {
             throw new EzException("Missing field");
         }
 
         if (findUserByEmail(userRequest) != null) {
-            throw new EzException("User is exists!");
+            throw new EzException("User email is exists!");
         }
-        userRepository.insertUser(userRequest.getFullname(), userRequest.getEmail(), userRequest.getPhone());
+
+        if (findUserByPhoneNumber(userRequest)!= null) {
+            throw new EzException("User phone number is exists");
+        }
+
+        String encryptPassword = EncryptPasswordUtils.encryptPassword(userRequest.getPassword());
+        userRepository.insertUser(userRequest.getFullname(), userRequest.getEmail(), userRequest.getPhone(), encryptPassword);
     }
 
     @Override
@@ -38,6 +46,17 @@ public class UserServiceImpl implements UserService {
         }
 
         User currentUser = userRepository.getUserByEmail(userRequest.getEmail());
+        UserInfo userInfo =  userMapper.userToUserInfo(currentUser);
+        return userInfo;
+    }
+
+    @Override
+    public UserInfo findUserByPhoneNumber(UserRequest userRequest) throws EzException {
+        if (Utils.isBlank(userRequest.getPhone())) {
+            throw new EzException("Missing phone number");
+        }
+
+        User currentUser = userRepository.getUserByPhoneNumber(userRequest.getPhone());
         UserInfo userInfo =  userMapper.userToUserInfo(currentUser);
         return userInfo;
     }
