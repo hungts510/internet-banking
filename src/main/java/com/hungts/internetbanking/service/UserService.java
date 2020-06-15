@@ -7,7 +7,7 @@ import com.hungts.internetbanking.model.request.UserRequest;
 public interface UserService {
     void createUser(UserRequest userRequest) throws EzException;
     
-    UserInfo findUserByEmail(UserRequest userRequest) throws EzException;
+    UserInfo findUserByEmail(String email) throws EzException;
 
-    UserInfo findUserByPhoneNumber(UserRequest userRequest) throws EzException;
+    UserInfo findUserByPhoneNumber(String phoneNumber) throws EzException;
 }

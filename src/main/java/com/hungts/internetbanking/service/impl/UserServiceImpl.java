@@ -10,10 +10,15 @@ import com.hungts.internetbanking.service.UserService;
 import com.hungts.internetbanking.util.EncryptPasswordUtils;
 import com.hungts.internetbanking.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     UserRepository userRepository;
     
@@ -27,11 +32,11 @@ public class UserServiceImpl implements UserService {
             throw new EzException("Missing field");
         }
 
-        if (findUserByEmail(userRequest) != null) {
+        if (findUserByEmail(userRequest.getEmail()) != null) {
             throw new EzException("User email is exists!");
         }
 
-        if (findUserByPhoneNumber(userRequest)!= null) {
+        if (findUserByPhoneNumber(userRequest.getPhone())!= null) {
             throw new EzException("User phone number is exists");
         }
 
@@ -40,24 +45,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserInfo findUserByEmail(UserRequest userRequest) throws EzException {
-        if (Utils.isBlank(userRequest.getEmail())) {
+    public UserInfo findUserByEmail(String email) throws EzException {
+        if (Utils.isBlank(email)) {
             throw new EzException("Missing email");
         }
 
-        User currentUser = userRepository.getUserByEmail(userRequest.getEmail());
+        User currentUser = userRepository.getUserByEmail(email);
         UserInfo userInfo =  userMapper.userToUserInfo(currentUser);
         return userInfo;
     }
 
     @Override
-    public UserInfo findUserByPhoneNumber(UserRequest userRequest) throws EzException {
-        if (Utils.isBlank(userRequest.getPhone())) {
+    public UserInfo findUserByPhoneNumber(String phoneNumber) throws EzException {
+        if (Utils.isBlank(phoneNumber)) {
             throw new EzException("Missing phone number");
         }
 
-        User currentUser = userRepository.getUserByPhoneNumber(userRequest.getPhone());
+        User currentUser = userRepository.getUserByPhoneNumber(phoneNumber);
         UserInfo userInfo =  userMapper.userToUserInfo(currentUser);
         return userInfo;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
+        UserInfo userInfo = findUserByPhoneNumber(phoneNumber);
+
+        if (userInfo == null) {
+            throw new UsernameNotFoundException("User not found with username: " + phoneNumber);
+        }
+        return new org.springframework.security.core.userdetails.User(userInfo.getPhone(), userInfo.getPassword(),
+                new ArrayList<>());
     }
 }
