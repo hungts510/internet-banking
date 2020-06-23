@@ -3,11 +3,14 @@ package com.hungts.internetbanking.controller;
 import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.model.info.UserInfo;
+import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.UserRequest;
 import com.hungts.internetbanking.model.response.EzResponse;
 import com.hungts.internetbanking.model.response.ResponseBody;
+import com.hungts.internetbanking.service.ReceiverService;
 import com.hungts.internetbanking.service.UserService;
 import com.hungts.internetbanking.util.Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,10 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    ReceiverService receiverService;
+
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @RequestMapping(value = ContextPath.User.CREATE, method = RequestMethod.POST)
     public ResponseEntity<?> createUser(@RequestBody UserRequest userRequest) {
         userService.createUser(userRequest);
@@ -50,6 +57,22 @@ public class UserController {
             responseBody = new ResponseBody(0, "Success", userInfo);
         }
 
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.User.SAVE_RECEIVER, method = RequestMethod.POST)
+    public ResponseEntity<?> saveReceiver(@RequestBody AccountRequest accountRequest) {
+        if (accountRequest.getAccountNumber() == null || accountRequest.getAccountNumber() <= 0) {
+            throw new EzException("Missing field account number");
+        }
+
+        if (StringUtils.isBlank(accountRequest.getAccountName())) {
+            throw new EzException("Missing field account name");
+        }
+
+        receiverService.createReceiver(accountRequest);
+        ResponseBody responseBody = new ResponseBody(0, "Success");
         return EzResponse.response(responseBody);
     }
 }
