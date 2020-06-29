@@ -109,4 +109,16 @@ public class UserController {
         ResponseBody responseBody = new ResponseBody(0, "Success");
         return EzResponse.response(responseBody);
     }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.User.REMOVE_RECEIVER, method = RequestMethod.POST)
+    public ResponseEntity<?> removeReceiver(@RequestBody AccountRequest accountRequest) {
+        if (accountRequest.getAccountNumber() == null || accountRequest.getAccountNumber() <= 0) {
+            throw new EzException("Missing field account number");
+        }
+
+        receiverService.removeReceiver(accountRequest);
+        ResponseBody responseBody = new ResponseBody(0, "Success");
+        return EzResponse.response(responseBody);
+    }
 }

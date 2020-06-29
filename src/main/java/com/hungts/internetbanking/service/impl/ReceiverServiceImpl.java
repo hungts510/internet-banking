@@ -61,4 +61,22 @@ public class ReceiverServiceImpl implements ReceiverService {
 
         receiverRepository.updateReceiver(currentReceiver.getId(), accountRequest.getAccountName(), new Date());
     }
+
+    @Override
+    public void removeReceiver(AccountRequest accountRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+
+        UserInfo userInfo = userService.findUserByPhoneNumber(phoneNumber);
+        if (userInfo == null) {
+            throw new EzException("User not exist");
+        }
+
+        Receiver currentReceiver = receiverRepository.getReceiverByUserIdAndAccountNumber(userInfo.getUserId(), accountRequest.getAccountNumber());
+        if (currentReceiver == null) {
+            throw new EzException("Receiver not exist");
+        }
+
+        receiverRepository.deleteReceiver(currentReceiver.getId());
+    }
 }

@@ -29,4 +29,7 @@ public interface ReceiverRepository {
 
     @Update("UPDATE receiver SET receiver_name = #{receiverName}, updated_at = #{updatedAt} WHERE id = #{receiverId}")
     void updateReceiver(int receiverId, String receiverName, Date updatedAt);
+
+    @Delete("DELETE FROM receiver WHERE id = #{receiverId}")
+    void deleteReceiver(int receiverId);
 }
