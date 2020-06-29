@@ -4,6 +4,8 @@ import com.hungts.internetbanking.model.entity.Account;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Mapper
 @Repository
 public interface AccountRepository {
@@ -24,4 +26,8 @@ public interface AccountRepository {
             @Result(column = "updated_at", property = "updatedAt")
     })
     Account getAccountById(int id);
+
+    @Select("SELECT * FROM account WHERE user_id = #{userId}")
+    @ResultMap("AccountObject")
+    List<Account> getAllAccountByUserId(int userId);
 }

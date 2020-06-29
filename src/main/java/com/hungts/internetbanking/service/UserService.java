@@ -10,4 +10,6 @@ public interface UserService {
     UserInfo findUserByEmail(String email) throws EzException;
 
     UserInfo findUserByPhoneNumber(String phoneNumber) throws EzException;
+
+
 }

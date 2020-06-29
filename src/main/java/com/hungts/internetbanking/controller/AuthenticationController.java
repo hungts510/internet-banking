@@ -2,8 +2,8 @@ package com.hungts.internetbanking.controller;
 
 import com.hungts.internetbanking.model.info.UserInfo;
 import com.hungts.internetbanking.model.request.JwtRequest;
-import com.hungts.internetbanking.model.response.JwtResponse;
-import com.hungts.internetbanking.service.UserService;
+import com.hungts.internetbanking.model.response.EzResponse;
+import com.hungts.internetbanking.model.response.ResponseBody;
 import com.hungts.internetbanking.service.impl.UserServiceImpl;
 import com.hungts.internetbanking.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,8 @@ public class AuthenticationController {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final String token = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtResponse(token));
+        ResponseBody responseBody = new ResponseBody(0, "Success", token);
+        return EzResponse.response(responseBody);
     }
 
     private void authenticate(String username, String password) throws Exception {

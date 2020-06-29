@@ -90,6 +90,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         User currentUser = userRepository.getUserByPhoneNumber(phoneNumber);
         UserInfo userInfo = userMapper.userToUserInfo(currentUser);
+        Role role = roleRepository.getRoleFromUserId(userInfo.getUserId());
+        userInfo.setRole(role.getId());
         return userInfo;
     }
 

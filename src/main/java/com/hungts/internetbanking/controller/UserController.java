@@ -2,11 +2,13 @@ package com.hungts.internetbanking.controller;
 
 import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
+import com.hungts.internetbanking.model.info.AccountInfo;
 import com.hungts.internetbanking.model.info.UserInfo;
 import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.UserRequest;
 import com.hungts.internetbanking.model.response.EzResponse;
 import com.hungts.internetbanking.model.response.ResponseBody;
+import com.hungts.internetbanking.service.AccountService;
 import com.hungts.internetbanking.service.ReceiverService;
 import com.hungts.internetbanking.service.UserService;
 import com.hungts.internetbanking.util.Utils;
@@ -15,19 +17,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping(value = ContextPath.User.USER, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = ContextPath.User.USER)
 public class UserController {
     @Autowired
     UserService userService;
 
     @Autowired
     ReceiverService receiverService;
+
+    @Autowired
+    AccountService accountService;
 
     @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @RequestMapping(value = ContextPath.User.CREATE, method = RequestMethod.POST)
@@ -39,22 +45,18 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ROLE_CUSTOMER')")
-    @RequestMapping(value = ContextPath.User.INFO, method = RequestMethod.POST)
-    public ResponseEntity<?> getUserInfo(@RequestBody UserRequest userRequest) {
-        if (Utils.isBlank(userRequest.getEmail()) && Utils.isBlank(userRequest.getPhone())) {
-            throw new EzException("Missing field");
-        }
+    @RequestMapping(value = ContextPath.User.INFO, method = RequestMethod.GET)
+    public ResponseEntity<?> getUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
 
-        UserInfo userInfo = null;
-        if (Utils.isNotEmpty(userRequest.getPhone())) {
-            userInfo = userService.findUserByPhoneNumber(userRequest.getPhone());
-        } else if (Utils.isNotEmpty(userRequest.getEmail())) {
-            userInfo = userService.findUserByEmail(userRequest.getEmail());
-        }
+        UserInfo userInfo = userService.findUserByPhoneNumber(phoneNumber);
 
-        ResponseBody responseBody = new ResponseBody();
+        ResponseBody responseBody;
         if (userInfo != null) {
             responseBody = new ResponseBody(0, "Success", userInfo);
+        } else {
+            responseBody = new ResponseBody(1, "Fail", "User does not exist!");
         }
 
         return EzResponse.response(responseBody);
@@ -72,6 +74,38 @@ public class UserController {
         }
 
         receiverService.createReceiver(accountRequest);
+        ResponseBody responseBody = new ResponseBody(0, "Success");
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.User.LIST_ACCOUNT, method = RequestMethod.GET)
+    public ResponseEntity<?> listAccount() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+
+        UserInfo userInfo = userService.findUserByPhoneNumber(phoneNumber);
+        if (userInfo == null) {
+            throw new EzException("User not exist");
+        }
+
+        List<AccountInfo> accountInfoList = accountService.getAllAccountByUserId(userInfo.getUserId());
+        ResponseBody responseBody = new ResponseBody(0, "Success", accountInfoList);
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.User.UPDATE_RECEIVER, method = RequestMethod.POST)
+    public ResponseEntity<?> updateReceiver(@RequestBody AccountRequest accountRequest) {
+        if (accountRequest.getAccountNumber() == null || accountRequest.getAccountNumber() <= 0) {
+            throw new EzException("Missing field account number");
+        }
+
+        if (StringUtils.isBlank(accountRequest.getAccountName())) {
+            throw new EzException("Missing field account name");
+        }
+
+        receiverService.updateReceiver(accountRequest);
         ResponseBody responseBody = new ResponseBody(0, "Success");
         return EzResponse.response(responseBody);
     }

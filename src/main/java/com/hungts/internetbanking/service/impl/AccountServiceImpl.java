@@ -9,7 +9,9 @@ import com.hungts.internetbanking.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -40,5 +42,16 @@ public class AccountServiceImpl implements AccountService {
         long accountNumber = Long.parseLong(accountNumberString);
 
         return accountNumber;
+    }
+
+    @Override
+    public List<AccountInfo> getAllAccountByUserId(Integer userId) {
+        List<Account> accountList = accountRepository.getAllAccountByUserId(userId);
+
+        List<AccountInfo> accountInfoList = new ArrayList<>();
+        for (Account account : accountList) {
+            accountInfoList.add(new AccountInfo(account));
+        }
+        return accountInfoList;
     }
 }
