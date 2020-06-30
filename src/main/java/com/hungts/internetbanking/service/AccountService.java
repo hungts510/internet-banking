@@ -8,4 +8,6 @@ public interface AccountService {
     AccountInfo createAccount(AccountInfo accountRequest);
 
     List<AccountInfo> getAllAccountByUserId(Integer userId);
+
+    AccountInfo getAccountInfoByAccountNumber(long accountNumber);
 }

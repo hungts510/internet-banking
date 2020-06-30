@@ -1,11 +1,13 @@
 package com.hungts.internetbanking.service.impl;
 
 import com.hungts.internetbanking.define.Constant;
+import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.mapper.AccountMapper;
 import com.hungts.internetbanking.model.entity.Account;
 import com.hungts.internetbanking.model.info.AccountInfo;
 import com.hungts.internetbanking.repository.AccountRepository;
 import com.hungts.internetbanking.service.AccountService;
+import org.apache.kafka.common.errors.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +24,12 @@ public class AccountServiceImpl implements AccountService {
     public AccountInfo createAccount(AccountInfo accountRequest) {
         Date currentDate = new Date();
 
-        Account accountInsert = Account.builder()
-                .accountNumber(generateUniqueAccountNumber())
-                .accountType(accountRequest.getAccountType())
-                .userId(accountRequest.getUserId())
-                .createdAt(currentDate)
-                .updatedAt(currentDate)
-                .build();
+        Account accountInsert = new Account();
+        accountInsert.setAccountNumber(generateUniqueAccountNumber());
+        accountInsert.setAccountType(accountRequest.getAccountType());
+        accountInsert.setUserId(accountRequest.getUserId());
+        accountInsert.setCreatedAt(currentDate);
+        accountInsert.setUpdatedAt(currentDate);
 
         accountRepository.saveAccount(accountInsert);
         Account account = accountRepository.getAccountById(accountInsert.getId());
@@ -53,5 +54,16 @@ public class AccountServiceImpl implements AccountService {
             accountInfoList.add(new AccountInfo(account));
         }
         return accountInfoList;
+    }
+
+    @Override
+    public AccountInfo getAccountInfoByAccountNumber(long accountNumber) {
+        Account account = accountRepository.getCustomerAccountByAccountNumber(accountNumber);
+
+        if (account == null) {
+            throw new EzException("Account does not exist!");
+        }
+
+        return new AccountInfo(account);
     }
 }

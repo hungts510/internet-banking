@@ -4,6 +4,8 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.util.Random;
+
 public class Utils {
     public static void close(AutoCloseable closeable) {
         try {
@@ -53,5 +55,16 @@ public class Utils {
             }
         }
         return builder.toString();
+    }
+
+    public static String randomOTP() {
+        String numbers = "0123456789";
+        Random randomMethod = new Random();
+        char[] otp = new char[6];
+        for (int i = 0; i < 6; i++) {
+            otp[i] = numbers.charAt(randomMethod.nextInt(numbers.length()));
+        }
+
+        return new String(otp);
     }
 }

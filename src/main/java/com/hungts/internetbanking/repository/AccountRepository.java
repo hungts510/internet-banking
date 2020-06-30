@@ -30,4 +30,16 @@ public interface AccountRepository {
     @Select("SELECT * FROM account WHERE user_id = #{userId}")
     @ResultMap("AccountObject")
     List<Account> getAllAccountByUserId(int userId);
+
+    @Select("SELECT id, account_number, account_type, user_id, created_at, updated_at FROM account WHERE account_number = #{accountNumber}")
+    @Results(
+            id = "AccountInfo", value = {
+            @Result(column = "id", property = "id", id = true),
+            @Result(column = "account_number", property = "accountNumber"),
+            @Result(column = "account_type", property = "accountType"),
+            @Result(column = "user_id", property = "userId"),
+            @Result(column = "created_at", property = "createdAt"),
+            @Result(column = "updated_at", property = "updatedAt")
+    })
+    Account getCustomerAccountByAccountNumber(long accountNumber);
 }

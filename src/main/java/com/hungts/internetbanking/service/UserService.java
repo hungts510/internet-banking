@@ -11,5 +11,9 @@ public interface UserService {
 
     UserInfo findUserByPhoneNumber(String phoneNumber) throws EzException;
 
+    void changePassword(String phoneNumber, String oldPassword, String newPassword);
 
+    void sendEmailResetPassword(String email);
+
+    void resetPassword(String email, String otp);
 }

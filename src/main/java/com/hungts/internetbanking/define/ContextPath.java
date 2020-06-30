@@ -8,5 +8,13 @@ public class ContextPath {
         public static final String SAVE_RECEIVER = "/save-receiver";
         public static final String LIST_ACCOUNT = "/list-account";
         public static final String UPDATE_RECEIVER = "/update-receiver";
+        public static final String CHANGE_PASSWORD = "/change-password";
+        public static final String FORGOT_PASSWORD = "/forgot-password";
+        public static final String RESET_PASSWORD = "/reset-password";
+    }
+
+    public static final class Account {
+        public static final String ACCOUNT = "/account";
+        public static final String INFO = "/info";
     }
 }

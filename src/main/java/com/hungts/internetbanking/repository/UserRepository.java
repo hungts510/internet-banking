@@ -16,4 +16,7 @@ public interface UserRepository {
 
     @Select("SELECT * FROM user WHERE phone = #{phone}")
     User getUserByPhoneNumber(String phone);
+
+    @Update("UPDATE user SET password = #{newPassword} WHERE id = #{userId}")
+    void updatePassword(int userId, String newPassword);
 }

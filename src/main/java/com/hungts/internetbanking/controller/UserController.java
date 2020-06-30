@@ -5,6 +5,7 @@ import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.model.info.AccountInfo;
 import com.hungts.internetbanking.model.info.UserInfo;
 import com.hungts.internetbanking.model.request.AccountRequest;
+import com.hungts.internetbanking.model.request.ChangePasswordRequest;
 import com.hungts.internetbanking.model.request.UserRequest;
 import com.hungts.internetbanking.model.response.EzResponse;
 import com.hungts.internetbanking.model.response.ResponseBody;
@@ -106,6 +107,51 @@ public class UserController {
         }
 
         receiverService.updateReceiver(accountRequest);
+        ResponseBody responseBody = new ResponseBody(0, "Success");
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.User.CHANGE_PASSWORD, method = RequestMethod.POST)
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        if (StringUtils.isBlank(changePasswordRequest.getOldPassword()) || StringUtils.isBlank(changePasswordRequest.getNewPassword())) {
+            throw new EzException("Missing old password or new password");
+        }
+
+        if (changePasswordRequest.getOldPassword().equals(changePasswordRequest.getNewPassword())) {
+            throw new EzException("Old password and new password are the same");
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+
+        userService.changePassword(phoneNumber, changePasswordRequest.getOldPassword(), changePasswordRequest.getNewPassword());
+        ResponseBody responseBody = new ResponseBody(0, "Success");
+        return EzResponse.response(responseBody);
+    }
+
+    @RequestMapping(value = ContextPath.User.FORGOT_PASSWORD, method = RequestMethod.POST)
+    public ResponseEntity<?> forgetPassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        if (StringUtils.isBlank(changePasswordRequest.getEmail())) {
+            throw new EzException("Missing email");
+        }
+
+        userService.sendEmailResetPassword(changePasswordRequest.getEmail());
+        ResponseBody responseBody = new ResponseBody(0, "Success");
+        return EzResponse.response(responseBody);
+    }
+
+    @RequestMapping(value = ContextPath.User.RESET_PASSWORD, method = RequestMethod.POST)
+    public ResponseEntity<?> resetPassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        if (StringUtils.isBlank(changePasswordRequest.getEmail())) {
+            throw new EzException("Missing email");
+        }
+
+        if (StringUtils.isBlank(changePasswordRequest.getOtp())) {
+            throw new EzException("Missing otp");
+        }
+
+        userService.resetPassword(changePasswordRequest.getEmail(), changePasswordRequest.getOtp());
         ResponseBody responseBody = new ResponseBody(0, "Success");
         return EzResponse.response(responseBody);
     }
