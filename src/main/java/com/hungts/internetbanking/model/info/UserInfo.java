@@ -21,6 +21,6 @@ public class UserInfo {
     @JsonProperty("phone")
     private String phone;
 
-    @JsonProperty(value = "role", access = JsonProperty.Access.READ_ONLY)
+    @JsonProperty(value = "role")
     private Integer role;
 }

@@ -12,6 +12,7 @@ public class ContextPath {
         public static final String CHANGE_PASSWORD = "/change-password";
         public static final String FORGOT_PASSWORD = "/forgot-password";
         public static final String RESET_PASSWORD = "/reset-password";
+        public static final String SAVE_DEBTOR = "/save-debtor";
     }
 
     public static final class Account {

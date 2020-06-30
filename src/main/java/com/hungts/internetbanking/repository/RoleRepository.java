@@ -1,10 +1,7 @@
 package com.hungts.internetbanking.repository;
 
 import com.hungts.internetbanking.model.entity.Role;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 @Mapper
@@ -16,4 +13,8 @@ public interface RoleRepository {
             @Result(column = "role_name", property = "roleName")
     })
     Role getRoleFromUserId(Integer userId);
+
+    @Insert("INSERT INTO user_role(user_id, role_id) VALUES(#{userId}, #{roleId})")
+    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Integer.class)
+    void saveUserRole(int userId, int roleId);
 }

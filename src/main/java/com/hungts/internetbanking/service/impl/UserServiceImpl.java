@@ -2,24 +2,27 @@ package com.hungts.internetbanking.service.impl;
 
 import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.exception.EzException;
+import com.hungts.internetbanking.mapper.DebtorMapper;
 import com.hungts.internetbanking.mapper.UserMapper;
+import com.hungts.internetbanking.model.entity.Debtor;
 import com.hungts.internetbanking.model.entity.ResetPasswordRequest;
 import com.hungts.internetbanking.model.entity.Role;
 import com.hungts.internetbanking.model.entity.User;
 import com.hungts.internetbanking.model.info.AccountInfo;
+import com.hungts.internetbanking.model.info.DebtorInfo;
 import com.hungts.internetbanking.model.info.UserInfo;
+import com.hungts.internetbanking.model.request.DebtorRequest;
 import com.hungts.internetbanking.model.request.UserRequest;
-import com.hungts.internetbanking.repository.ReceiverRepository;
-import com.hungts.internetbanking.repository.ResetPasswordRepository;
-import com.hungts.internetbanking.repository.RoleRepository;
-import com.hungts.internetbanking.repository.UserRepository;
+import com.hungts.internetbanking.repository.*;
 import com.hungts.internetbanking.service.AccountService;
 import com.hungts.internetbanking.service.UserService;
 import com.hungts.internetbanking.util.EmailUtil;
 import com.hungts.internetbanking.util.EncryptPasswordUtils;
 import com.hungts.internetbanking.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -49,8 +52,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     ResetPasswordRepository resetPasswordRepository;
 
+    @Autowired
+    DebtorRepository debtorRepository;
+
+    @Autowired
+    DebtorMapper debtorMapper;
+
     @Override
-    public void createUser(UserRequest userRequest) throws EzException {
+    public UserInfo createUser(UserRequest userRequest) throws EzException {
         if (Utils.isEmpty(userRequest.getFullname()) || Utils.isEmpty(userRequest.getEmail())
                 || Utils.isEmpty(userRequest.getPhone()) || Utils.isEmpty(userRequest.getPassword())) {
             throw new EzException("Missing field");
@@ -76,6 +85,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         accountRequest.setUserId((insertUser.getId()));
         accountRequest.setAccountType(Constant.AccountType.SPEND_ACCOUNT);
         AccountInfo accountInfo = accountService.createAccount(accountRequest);
+
+        roleRepository.saveUserRole(insertUser.getId(), 1);
+
+        return userMapper.userToUserInfo(insertUser);
     }
 
     @Override
@@ -97,7 +110,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         User currentUser = userRepository.getUserByPhoneNumber(phoneNumber);
         UserInfo userInfo = userMapper.userToUserInfo(currentUser);
+
+        if (userInfo == null) {
+            return null;
+        }
+
         Role role = roleRepository.getRoleFromUserId(userInfo.getUserId());
+
+        if (role == null) {
+            return null;
+        }
         userInfo.setRole(role.getId());
         return userInfo;
     }
@@ -170,5 +192,29 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         String encryptDefaultPassword = EncryptPasswordUtils.encryptPassword(Constant.DEFAULT_PASSWORD);
         userRepository.updatePassword(userInfo.getUserId(), encryptDefaultPassword);
+    }
+
+    @Override
+    public DebtorInfo saveDebtor(DebtorRequest debtorRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+
+        UserInfo userInfo = findUserByPhoneNumber(phoneNumber);
+        if (userInfo == null) {
+            throw new EzException("User does not exist");
+        }
+
+        Debtor insertDebtor = new Debtor();
+        insertDebtor.setUserId(userInfo.getUserId());
+        insertDebtor.setDebtorAccountNumber(debtorRequest.getDebtorAccountNumber());
+        insertDebtor.setAmount(debtorRequest.getAmount());
+        insertDebtor.setDescription(debtorRequest.getDescription());
+        insertDebtor.setCreatedAt(new Date());
+        insertDebtor.setUpdatedAt(new Date());
+        insertDebtor.setStatus(1);
+
+        debtorRepository.saveDebtor(insertDebtor);
+        Debtor debtor = debtorRepository.getDebtorById(insertDebtor.getId());
+        return debtorMapper.debtorToDebtorInfo(debtor);
     }
 }

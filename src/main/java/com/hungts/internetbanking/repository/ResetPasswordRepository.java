@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface ResetPasswordRepository {
 
     @Insert("INSERT INTO reset_password_request(user_id, otp, created_at, status) VALUES (#{userId}, #{otp}, #{createdAt}, #{status})")
+    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Integer.class)
     void saveResetPasswordRequest(ResetPasswordRequest resetPasswordRequest);
 
     @Select("SELECT * FROM reset_password_request WHERE user_id = #{userId} ORDER BY created_at DESC LIMIT 1")

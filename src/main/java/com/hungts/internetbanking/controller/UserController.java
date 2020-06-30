@@ -3,11 +3,10 @@ package com.hungts.internetbanking.controller;
 import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.model.info.AccountInfo;
+import com.hungts.internetbanking.model.info.DebtorInfo;
 import com.hungts.internetbanking.model.info.UserInfo;
-import com.hungts.internetbanking.model.request.AccountRequest;
+import com.hungts.internetbanking.model.request.*;
 import com.hungts.internetbanking.model.request.ChangePasswordRequest;
-import com.hungts.internetbanking.model.request.ChangePasswordRequest;
-import com.hungts.internetbanking.model.request.UserRequest;
 import com.hungts.internetbanking.model.response.EzResponse;
 import com.hungts.internetbanking.model.response.ResponseBody;
 import com.hungts.internetbanking.service.AccountService;
@@ -40,13 +39,13 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @RequestMapping(value = ContextPath.User.CREATE, method = RequestMethod.POST)
     public ResponseEntity<?> createUser(@RequestBody UserRequest userRequest) {
-        userService.createUser(userRequest);
+        UserInfo userInfo = userService.createUser(userRequest);
 
-        ResponseBody responseBody = new ResponseBody(0, "Success");
+        ResponseBody responseBody = new ResponseBody(0, "Success", userInfo);
         return EzResponse.response(responseBody);
     }
 
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_ADMIN') ")
     @RequestMapping(value = ContextPath.User.INFO, method = RequestMethod.GET)
     public ResponseEntity<?> getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -166,6 +165,21 @@ public class UserController {
 
         userService.resetPassword(changePasswordRequest.getEmail(), changePasswordRequest.getOtp());
         ResponseBody responseBody = new ResponseBody(0, "Success");
+        return EzResponse.response(responseBody);
+    }
+
+    @RequestMapping(value = ContextPath.User.SAVE_DEBTOR, method = RequestMethod.POST)
+    public ResponseEntity<?> saveDebtor(@RequestBody DebtorRequest debtorRequest) {
+        if (debtorRequest.getDebtorAccountNumber() == null || debtorRequest.getDebtorAccountNumber() <= 0) {
+            throw new EzException("Missing account number field");
+        }
+
+        if (debtorRequest.getAmount() == null || debtorRequest.getAmount() <= 0) {
+            throw new EzException("Missing amount field");
+        }
+
+        DebtorInfo debtorInfo = userService.saveDebtor(debtorRequest);
+        ResponseBody responseBody = new ResponseBody(0, "Success", debtorInfo);
         return EzResponse.response(responseBody);
     }
 }
