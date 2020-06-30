@@ -7,4 +7,6 @@ public interface ReceiverService {
     void createReceiver(AccountRequest accountRequest);
 
     void updateReceiver(AccountRequest accountRequest);
+
+    void removeReceiver(AccountRequest accountRequest);
 }
