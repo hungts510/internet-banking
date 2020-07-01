@@ -5,6 +5,9 @@ import lombok.Data;
 
 @Data
 public class DebtorRequest {
+    @JsonProperty("debt_id")
+    private Integer debtId;
+
     @JsonProperty("user_id")
     private Integer userId;
 
@@ -16,4 +19,10 @@ public class DebtorRequest {
 
     @JsonProperty("description")
     private String description;
+
+    @JsonProperty("debt_type")
+    private Integer debtType;
+
+    @JsonProperty("status")
+    private Integer status;
 }

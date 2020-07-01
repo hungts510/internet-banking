@@ -13,10 +13,14 @@ public class ContextPath {
         public static final String FORGOT_PASSWORD = "/forgot-password";
         public static final String RESET_PASSWORD = "/reset-password";
         public static final String SAVE_DEBTOR = "/save-debtor";
+        public static final String LIST_DEBTS = "/list-debts";
+        public static final String CANCEL_DEBT = "/cancel-debt";
     }
 
     public static final class Account {
         public static final String ACCOUNT = "/account";
         public static final String INFO = "/info";
+        public static final String PAY_IN = "/pay-in";
+        public static final String TRANSFER = "/transfer";
     }
 }

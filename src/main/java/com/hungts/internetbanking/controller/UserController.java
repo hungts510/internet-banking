@@ -1,26 +1,31 @@
 package com.hungts.internetbanking.controller;
 
+import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.model.info.AccountInfo;
 import com.hungts.internetbanking.model.info.DebtorInfo;
 import com.hungts.internetbanking.model.info.UserInfo;
-import com.hungts.internetbanking.model.request.*;
+import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.ChangePasswordRequest;
+import com.hungts.internetbanking.model.request.DebtorRequest;
+import com.hungts.internetbanking.model.request.UserRequest;
+import com.hungts.internetbanking.model.response.DebtorInfoResponse;
 import com.hungts.internetbanking.model.response.EzResponse;
 import com.hungts.internetbanking.model.response.ResponseBody;
 import com.hungts.internetbanking.service.AccountService;
 import com.hungts.internetbanking.service.ReceiverService;
 import com.hungts.internetbanking.service.UserService;
-import com.hungts.internetbanking.util.Utils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -182,4 +187,60 @@ public class UserController {
         ResponseBody responseBody = new ResponseBody(0, "Success", debtorInfo);
         return EzResponse.response(responseBody);
     }
+
+    @RequestMapping(value = ContextPath.User.LIST_DEBTS, method = RequestMethod.POST)
+    public ResponseEntity<?> viewListDebts(@RequestBody DebtorRequest debtorRequest) {
+        if (debtorRequest.getDebtType() == null || debtorRequest.getDebtType() <= 0) {
+            throw new EzException("Missing debt type");
+        }
+
+        DebtorInfoResponse debtorInfoResponse = new DebtorInfoResponse();
+
+        if (debtorRequest.getDebtType().equals(Constant.DebtType.MY_DEBTORS)) {
+            List<DebtorInfo> debtorInfoList = userService.getListDebtors(debtorRequest);
+            debtorInfoResponse.setListDebtors(debtorInfoList);
+        } else if (debtorRequest.getDebtType().equals(Constant.DebtType.MY_DEBTS)) {
+            List<DebtorInfo> debtsInfoList = userService.getListDebts(debtorRequest);
+            debtorInfoResponse.setListDebts(debtsInfoList);
+        } else if (debtorRequest.getDebtType().equals(Constant.DebtType.ALL)) {
+            List<DebtorInfo> debtorInfoList = userService.getListDebtors(debtorRequest);
+            debtorInfoResponse.setListDebtors(debtorInfoList);
+            List<DebtorInfo> debtsInfoList = userService.getListDebts(debtorRequest);
+            debtorInfoResponse.setListDebts(debtsInfoList);
+        }
+
+        ResponseBody responseBody = new ResponseBody(0, "Success", debtorInfoResponse);
+        return EzResponse.response(responseBody);
+    }
+
+    @RequestMapping(value = ContextPath.User.CANCEL_DEBT, method = RequestMethod.POST)
+    public ResponseEntity<?> cancelDebt(@RequestBody DebtorRequest debtorRequest) {
+        if (debtorRequest.getDebtId() == null || debtorRequest.getDebtId() <= 0) {
+            throw new EzException("Missing debt type");
+        }
+
+        if (StringUtils.isBlank(debtorRequest.getDescription())) {
+            throw new EzException("Missing cancel debt request description");
+        }
+
+        DebtorInfoResponse debtorInfoResponse = new DebtorInfoResponse();
+
+        if (debtorRequest.getDebtType().equals(Constant.DebtType.MY_DEBTORS)) {
+            List<DebtorInfo> debtorInfoList = userService.getListDebtors(debtorRequest);
+            debtorInfoResponse.setListDebtors(debtorInfoList);
+        } else if (debtorRequest.getDebtType().equals(Constant.DebtType.MY_DEBTS)) {
+            List<DebtorInfo> debtsInfoList = userService.getListDebts(debtorRequest);
+            debtorInfoResponse.setListDebts(debtsInfoList);
+        } else if (debtorRequest.getDebtType().equals(Constant.DebtType.ALL)) {
+            List<DebtorInfo> debtorInfoList = userService.getListDebtors(debtorRequest);
+            debtorInfoResponse.setListDebtors(debtorInfoList);
+            List<DebtorInfo> debtsInfoList = userService.getListDebts(debtorRequest);
+            debtorInfoResponse.setListDebts(debtsInfoList);
+        }
+
+        ResponseBody responseBody = new ResponseBody(0, "Success", debtorInfoResponse);
+        return EzResponse.response(responseBody);
+    }
+
+
 }

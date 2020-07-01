@@ -42,4 +42,11 @@ public interface AccountRepository {
             @Result(column = "updated_at", property = "updatedAt")
     })
     Account getCustomerAccountByAccountNumber(long accountNumber);
+
+    @Select("SELECT * FROM account WHERE user_id = #{userId} AND account_type = #{accountType}")
+    @ResultMap("AccountObject")
+    Account getUserAccountByType(int userId, int accountType);
+
+    @Update("UPDATE account SET balance = #{newBalance} WHERE id = #{accountId}")
+    void updateAccountBalance(long newBalance, int accountId);
 }

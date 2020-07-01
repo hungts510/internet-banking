@@ -14,7 +14,7 @@ public class Account {
 
     private Integer accountType;
 
-    private Long balance;
+    private long balance;
 
     private Integer userId;
 

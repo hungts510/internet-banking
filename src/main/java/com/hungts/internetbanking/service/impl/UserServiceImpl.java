@@ -4,10 +4,7 @@ import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.mapper.DebtorMapper;
 import com.hungts.internetbanking.mapper.UserMapper;
-import com.hungts.internetbanking.model.entity.Debtor;
-import com.hungts.internetbanking.model.entity.ResetPasswordRequest;
-import com.hungts.internetbanking.model.entity.Role;
-import com.hungts.internetbanking.model.entity.User;
+import com.hungts.internetbanking.model.entity.*;
 import com.hungts.internetbanking.model.info.AccountInfo;
 import com.hungts.internetbanking.model.info.DebtorInfo;
 import com.hungts.internetbanking.model.info.UserInfo;
@@ -28,9 +25,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
@@ -39,6 +35,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    AccountRepository accountRepository;
 
     @Autowired
     UserMapper userMapper;
@@ -216,5 +215,46 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         debtorRepository.saveDebtor(insertDebtor);
         Debtor debtor = debtorRepository.getDebtorById(insertDebtor.getId());
         return debtorMapper.debtorToDebtorInfo(debtor);
+    }
+
+    @Override
+    public List<DebtorInfo> getListDebtors(DebtorRequest debtorRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+
+        UserInfo userInfo = findUserByPhoneNumber(phoneNumber);
+        if (userInfo == null) {
+            throw new EzException("User does not exist");
+        }
+
+        List<Debtor> debtorList = debtorRepository.getListDebtorsByUserId(userInfo.getUserId());
+        List<DebtorInfo> debtorInfoList = debtorList.stream().map(debtor -> debtorMapper.debtorToDebtorInfo(debtor)).collect(Collectors.toCollection(LinkedList::new));
+        return debtorInfoList;
+    }
+
+    @Override
+    public List<DebtorInfo> getListDebts(DebtorRequest debtorRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+
+        UserInfo userInfo = findUserByPhoneNumber(phoneNumber);
+        if (userInfo == null) {
+            throw new EzException("User does not exist");
+        }
+
+        Account spendAccount = accountRepository.getUserAccountByType(userInfo.getUserId(), Constant.AccountType.SPEND_ACCOUNT);
+        List<Debtor> debtorList = debtorRepository.getListDebtsByAccountNumber(spendAccount.getAccountNumber());
+        List<DebtorInfo> debtorInfoList = debtorList.stream().map(debtor -> debtorMapper.debtorToDebtorInfo(debtor)).collect(Collectors.toCollection(LinkedList::new));
+        return debtorInfoList;
+    }
+
+    @Override
+    public void cancelDebt(DebtorRequest debtorRequest) {
+        Debtor debtor = debtorRepository.getDebtorById(debtorRequest.getDebtId());
+        if (debtor == null) {
+            throw new EzException("Debtor does not exist");
+        }
+
+        debtorRepository.updateDebtorById(debtor.getId(), debtorRequest.getDescription(), new Date(), Constant.DebtStatus.CANCEL);
     }
 }

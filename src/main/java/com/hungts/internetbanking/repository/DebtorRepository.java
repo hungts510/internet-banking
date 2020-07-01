@@ -4,6 +4,9 @@ import com.hungts.internetbanking.model.entity.Debtor;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
+import java.util.List;
+
 @Mapper
 @Repository
 public interface DebtorRepository {
@@ -25,4 +28,15 @@ public interface DebtorRepository {
             @Result(column = "status", property = "status")
     })
     Debtor getDebtorById(int debtorId);
+
+    @Select("SELECT * FROM debtor WHERE user_id = #{userId}")
+    @ResultMap("DebtorObject")
+    List<Debtor> getListDebtorsByUserId(int userId);
+
+    @Select("SELECT * FROM debtor WHERE debtor_account_number = #{accountNumber}")
+    @ResultMap("DebtorObject")
+    List<Debtor> getListDebtsByAccountNumber(long accountNumber);
+
+    @Update("UPDATE debtor SET description = #{description}, updated_at = #{updatedAt}, status = #{status} WHERE id = #{debtId}")
+    void updateDebtorById(int debtId, String description, Date updatedAt, int status);
 }

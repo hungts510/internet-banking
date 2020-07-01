@@ -1,9 +1,11 @@
 package com.hungts.internetbanking.controller;
 
+import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.model.info.AccountInfo;
 import com.hungts.internetbanking.model.request.AccountRequest;
+import com.hungts.internetbanking.model.request.TransactionRequest;
 import com.hungts.internetbanking.model.response.EzResponse;
 import com.hungts.internetbanking.model.response.ResponseBody;
 import com.hungts.internetbanking.service.AccountService;
@@ -31,6 +33,48 @@ public class AccountController {
 
         AccountInfo accountInfo = accountService.getAccountInfoByAccountNumber(accountRequest.getAccountNumber());
         ResponseBody responseBody = new ResponseBody(0, "Success", accountInfo);
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @RequestMapping(value = ContextPath.Account.PAY_IN, method = RequestMethod.POST)
+    public ResponseEntity<?> payInToAccount(@RequestBody TransactionRequest transactionRequest) {
+        if (transactionRequest.getToAccountNumber() == null || transactionRequest.getToAccountNumber() <= 0) {
+            throw new EzException("Missing to account number");
+        }
+
+        if (transactionRequest.getAmount() == null || transactionRequest.getAmount() <= 0) {
+            throw new EzException("Missing transaction amount");
+        }
+
+        accountService.payInToAccount(transactionRequest);
+        ResponseBody responseBody = new ResponseBody(0, "Success");
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.Account.TRANSFER, method = RequestMethod.POST)
+    public ResponseEntity<?> transferMoney(@RequestBody TransactionRequest transactionRequest) {
+        if (transactionRequest.getFromAccountNumber() == null || transactionRequest.getFromAccountNumber() <= 0) {
+            throw new EzException("Missing source account number");
+        }
+
+        if (transactionRequest.getToAccountNumber() == null || transactionRequest.getToAccountNumber() <= 0) {
+            throw new EzException("Missing destination account number");
+        }
+
+        if (transactionRequest.getAmount() == null || transactionRequest.getAmount() <= 0) {
+            throw new EzException("Missing transaction amount");
+        }
+
+        if (StringUtils.isBlank(transactionRequest.getFromBank()) || StringUtils.isBlank(transactionRequest.getToBank())
+                || !transactionRequest.getFromBank().equals(transactionRequest.getToBank()) || transactionRequest.getFromBank().equals(Constant.BANK_NAME)
+                || !transactionRequest.getToBank().equals(Constant.BANK_NAME)) {
+            throw new EzException("API just for internal transfer purpose");
+        }
+
+        accountService.transferMoney(transactionRequest);
+        ResponseBody responseBody = new ResponseBody(0, "Success");
         return EzResponse.response(responseBody);
     }
 }

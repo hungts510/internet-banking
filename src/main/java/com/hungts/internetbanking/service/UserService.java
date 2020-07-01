@@ -6,6 +6,8 @@ import com.hungts.internetbanking.model.info.UserInfo;
 import com.hungts.internetbanking.model.request.DebtorRequest;
 import com.hungts.internetbanking.model.request.UserRequest;
 
+import java.util.List;
+
 public interface UserService {
     UserInfo createUser(UserRequest userRequest) throws EzException;
     
@@ -20,4 +22,10 @@ public interface UserService {
     void resetPassword(String email, String otp);
 
     DebtorInfo saveDebtor(DebtorRequest debtorRequest);
+
+    List<DebtorInfo> getListDebtors(DebtorRequest debtorRequest);
+
+    List<DebtorInfo> getListDebts(DebtorRequest debtorRequest);
+
+    void cancelDebt(DebtorRequest debtorRequest);
 }
