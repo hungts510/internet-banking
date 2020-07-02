@@ -10,8 +10,8 @@ import java.util.List;
 @Mapper
 @Repository
 public interface TransactionRepository {
-    @Insert("INSERT INTO transactions(from_user_id, to_user_id, from_account_number, to_account_number, amount, type, status, description, created_at, updated_at, from_bank, to_bank, otp) VALUES" +
-            "(#{fromUserId}, #{toUserId}, #{fromAccountNumber}, #{toAccountNumber}, #{amount}, #{type}, #{status}, #{description}, #{createdAt}, #{updatedAt}, #{fromBank}, #{toBank}, #{otp})")
+    @Insert("INSERT INTO transactions(from_user_id, to_user_id, from_account_number, to_account_number, amount, type, status, description, created_at, updated_at, from_bank, to_bank, otp, debt_id) VALUES" +
+            "(#{fromUserId}, #{toUserId}, #{fromAccountNumber}, #{toAccountNumber}, #{amount}, #{type}, #{status}, #{description}, #{createdAt}, #{updatedAt}, #{fromBank}, #{toBank}, #{otp}, #{debtId})")
     @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Integer.class)
     void saveTransaction(Transaction transaction);
 
@@ -32,6 +32,7 @@ public interface TransactionRepository {
             @Result(column = "from_bank", property = "fromBank"),
             @Result(column = "to_bank", property = "toBank"),
             @Result(column = "otp", property = "otp"),
+            @Result(column = "debt_id", property = "debtId"),
     })
     Transaction getUserTransactionByIdAndStatus(int transactionId, int userId, int status);
 

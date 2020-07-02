@@ -12,6 +12,7 @@ import com.hungts.internetbanking.model.info.UserInfo;
 import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.TransactionRequest;
 import com.hungts.internetbanking.repository.AccountRepository;
+import com.hungts.internetbanking.repository.DebtorRepository;
 import com.hungts.internetbanking.repository.TransactionRepository;
 import com.hungts.internetbanking.service.AccountService;
 import com.hungts.internetbanking.service.UserService;
@@ -38,6 +39,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     TransactionRepository transactionRepository;
+
+    @Autowired
+    DebtorRepository debtorRepository;
 
     @Autowired
     TransactionMapper transactionMapper;
@@ -177,7 +181,6 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return transactionMapper.transactionToTransactionInfo(transaction);
-
     }
 
     @Override
@@ -224,6 +227,11 @@ public class AccountServiceImpl implements AccountService {
         accountRepository.updateAccountBalance(newSourceBalance, userSourceAccount.getId());
         accountRepository.updateAccountBalance(newDestinationBalance, destinationAccount.getId());
         transactionRepository.updateTransactionStatus(Constant.TransactionStatus.SUCCESS, transaction.getId());
+
+        if (transaction.getDebtId() != null && transaction.getDebtId() > 0) {
+            String description = "PAID - Transaction id: " + transaction.getId();
+            debtorRepository.updateDebtorById(transaction.getDebtId(), description, new Date(), Constant.DebtStatus.PAID);
+        }
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.model.info.AccountInfo;
 import com.hungts.internetbanking.model.info.DebtorInfo;
+import com.hungts.internetbanking.model.info.TransactionInfo;
 import com.hungts.internetbanking.model.info.UserInfo;
 import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.ChangePasswordRequest;
@@ -216,31 +217,28 @@ public class UserController {
     @RequestMapping(value = ContextPath.User.CANCEL_DEBT, method = RequestMethod.POST)
     public ResponseEntity<?> cancelDebt(@RequestBody DebtorRequest debtorRequest) {
         if (debtorRequest.getDebtId() == null || debtorRequest.getDebtId() <= 0) {
-            throw new EzException("Missing debt type");
+            throw new EzException("Missing debt id");
         }
 
         if (StringUtils.isBlank(debtorRequest.getDescription())) {
             throw new EzException("Missing cancel debt request description");
         }
 
-        DebtorInfoResponse debtorInfoResponse = new DebtorInfoResponse();
+        userService.cancelDebt(debtorRequest);
 
-        if (debtorRequest.getDebtType().equals(Constant.DebtType.MY_DEBTORS)) {
-            List<DebtorInfo> debtorInfoList = userService.getListDebtors(debtorRequest);
-            debtorInfoResponse.setListDebtors(debtorInfoList);
-        } else if (debtorRequest.getDebtType().equals(Constant.DebtType.MY_DEBTS)) {
-            List<DebtorInfo> debtsInfoList = userService.getListDebts(debtorRequest);
-            debtorInfoResponse.setListDebts(debtsInfoList);
-        } else if (debtorRequest.getDebtType().equals(Constant.DebtType.ALL)) {
-            List<DebtorInfo> debtorInfoList = userService.getListDebtors(debtorRequest);
-            debtorInfoResponse.setListDebtors(debtorInfoList);
-            List<DebtorInfo> debtsInfoList = userService.getListDebts(debtorRequest);
-            debtorInfoResponse.setListDebts(debtsInfoList);
-        }
-
-        ResponseBody responseBody = new ResponseBody(0, "Success", debtorInfoResponse);
+        ResponseBody responseBody = new ResponseBody(0, "Success");
         return EzResponse.response(responseBody);
     }
 
+    @RequestMapping(value = ContextPath.User.PAY_DEBT, method = RequestMethod.POST)
+    public ResponseEntity<?> payDebt(@RequestBody DebtorRequest debtorRequest) {
+        if (debtorRequest.getDebtId() == null || debtorRequest.getDebtId() <= 0) {
+            throw new EzException("Missing debt id");
+        }
 
+        TransactionInfo transactionInfo = userService.payDebt(debtorRequest);
+
+        ResponseBody responseBody = new ResponseBody(0, "Success", transactionInfo);
+        return EzResponse.response(responseBody);
+    }
 }

@@ -35,4 +35,6 @@ public class Transaction {
     private String toBank;
 
     private String otp;
+
+    private Integer debtId;
 }

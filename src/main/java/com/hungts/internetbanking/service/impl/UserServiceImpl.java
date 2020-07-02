@@ -3,10 +3,12 @@ package com.hungts.internetbanking.service.impl;
 import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.mapper.DebtorMapper;
+import com.hungts.internetbanking.mapper.TransactionMapper;
 import com.hungts.internetbanking.mapper.UserMapper;
 import com.hungts.internetbanking.model.entity.*;
 import com.hungts.internetbanking.model.info.AccountInfo;
 import com.hungts.internetbanking.model.info.DebtorInfo;
+import com.hungts.internetbanking.model.info.TransactionInfo;
 import com.hungts.internetbanking.model.info.UserInfo;
 import com.hungts.internetbanking.model.request.DebtorRequest;
 import com.hungts.internetbanking.model.request.UserRequest;
@@ -55,7 +57,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     DebtorRepository debtorRepository;
 
     @Autowired
+    TransactionRepository transactionRepository;
+
+    @Autowired
     DebtorMapper debtorMapper;
+
+    @Autowired
+    TransactionMapper transactionMapper;
 
     @Override
     public UserInfo createUser(UserRequest userRequest) throws EzException {
@@ -256,5 +264,62 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         debtorRepository.updateDebtorById(debtor.getId(), debtorRequest.getDescription(), new Date(), Constant.DebtStatus.CANCEL);
+    }
+
+    @Override
+    public TransactionInfo payDebt(DebtorRequest debtorRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+
+        UserInfo userInfo = findUserByPhoneNumber(phoneNumber);
+        if (userInfo == null) {
+            throw new EzException("User does not exist");
+        }
+
+        Debtor debtor = debtorRepository.getDebtorById(debtorRequest.getDebtId());
+        if (debtor == null) {
+            throw new EzException("Debtor does not exist");
+        }
+
+        Long debtorAccountNumber = debtor.getDebtorAccountNumber();
+        Account debtorAccount = accountRepository.getAccountFullInfoByAccountNumber(debtorAccountNumber);
+
+        if (debtorAccount.getBalance() < debtor.getAmount()) {
+            throw new EzException("Not enough balance");
+        }
+
+        Account destinationAccount = accountRepository.getUserAccountByType(debtor.getUserId(), Constant.AccountType.SPEND_ACCOUNT);
+        if (destinationAccount == null) {
+            throw new EzException("Destination account does not exist");
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setFromUserId(debtorAccount.getUserId());
+        transaction.setToUserId(debtor.getUserId());
+        transaction.setFromBank(Constant.BANK_NAME);
+        transaction.setToBank(Constant.BANK_NAME);
+        transaction.setAmount(debtor.getAmount());
+        transaction.setDescription(debtor.getDescription());
+        transaction.setType(Constant.TransactionType.DEBT);
+        transaction.setStatus(Constant.TransactionStatus.PENDING);
+        transaction.setFromAccountNumber(debtorAccountNumber);
+        transaction.setToAccountNumber(destinationAccount.getAccountNumber());
+        transaction.setOtp(Utils.randomOTP());
+        transaction.setDebtId(debtor.getId());
+        transaction.setCreatedAt(new Date());
+        transaction.setUpdatedAt(new Date());
+
+        transactionRepository.saveTransaction(transaction);
+        if (transaction.getId() == null) {
+            throw new EzException("An error occurred while saving transaction");
+        }
+
+        try {
+            EmailUtil.sendTransferOTP(userInfo, transaction.getAmount(), transaction.getOtp());
+        } catch (Exception e) {
+            throw new EzException("Fail to send email");
+        }
+
+        return transactionMapper.transactionToTransactionInfo(transaction);
     }
 }

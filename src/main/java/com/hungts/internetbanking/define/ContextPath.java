@@ -15,6 +15,7 @@ public class ContextPath {
         public static final String SAVE_DEBTOR = "/save-debtor";
         public static final String LIST_DEBTS = "/list-debts";
         public static final String CANCEL_DEBT = "/cancel-debt";
+        public static final String PAY_DEBT = "/pay-debt";
     }
 
     public static final class Account {
