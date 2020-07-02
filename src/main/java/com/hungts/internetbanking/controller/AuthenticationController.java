@@ -15,8 +15,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(maxAge = 3600)
 @RestController
-@CrossOrigin
 public class AuthenticationController {
     @Autowired
     private AuthenticationManager authenticationManager;

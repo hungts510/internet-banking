@@ -1,6 +1,7 @@
 package com.hungts.internetbanking.config;
 
 import com.hungts.internetbanking.filter.AuthenticationFilter;
+import com.hungts.internetbanking.filter.SimpleCORSFilter;
 import com.hungts.internetbanking.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.session.SessionManagementFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import sun.java2d.pipe.SpanShapeRenderer;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private UserServiceImpl jwtUserDetailsService;
     @Autowired
     private AuthenticationFilter jwtRequestFilter;
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 // configure AuthenticationManager so that it knows from where to load
@@ -33,22 +40,33 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 // Use BCryptPasswordEncoder
         auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
+
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf().disable()
+        httpSecurity.cors().and().csrf().disable()
                 .authorizeRequests().antMatchers("/authenticate", "/user/forgot-password", "/user/reset-password").permitAll().
-        anyRequest().authenticated().and().
-        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+                anyRequest().authenticated().and().
+                exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new
+                UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+        return source;
     }
 }

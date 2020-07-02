@@ -23,13 +23,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(maxAge = 3600)
 @RestController
 @RequestMapping(value = ContextPath.User.USER)
 public class UserController {
@@ -174,6 +172,7 @@ public class UserController {
         return EzResponse.response(responseBody);
     }
 
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @RequestMapping(value = ContextPath.User.SAVE_DEBTOR, method = RequestMethod.POST)
     public ResponseEntity<?> saveDebtor(@RequestBody DebtorRequest debtorRequest) {
         if (debtorRequest.getDebtorAccountNumber() == null || debtorRequest.getDebtorAccountNumber() <= 0) {
@@ -189,6 +188,7 @@ public class UserController {
         return EzResponse.response(responseBody);
     }
 
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @RequestMapping(value = ContextPath.User.LIST_DEBTS, method = RequestMethod.POST)
     public ResponseEntity<?> viewListDebts(@RequestBody DebtorRequest debtorRequest) {
         if (debtorRequest.getDebtType() == null || debtorRequest.getDebtType() <= 0) {
@@ -214,6 +214,7 @@ public class UserController {
         return EzResponse.response(responseBody);
     }
 
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @RequestMapping(value = ContextPath.User.CANCEL_DEBT, method = RequestMethod.POST)
     public ResponseEntity<?> cancelDebt(@RequestBody DebtorRequest debtorRequest) {
         if (debtorRequest.getDebtId() == null || debtorRequest.getDebtId() <= 0) {
@@ -230,6 +231,7 @@ public class UserController {
         return EzResponse.response(responseBody);
     }
 
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @RequestMapping(value = ContextPath.User.PAY_DEBT, method = RequestMethod.POST)
     public ResponseEntity<?> payDebt(@RequestBody DebtorRequest debtorRequest) {
         if (debtorRequest.getDebtId() == null || debtorRequest.getDebtId() <= 0) {
