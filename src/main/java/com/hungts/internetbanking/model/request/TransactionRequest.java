@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class TransactionRequest {
+    @JsonProperty("transaction_id")
+    private Integer transactionId;
+
     @JsonProperty("from_user_id")
     private Integer fromUserId;
 
@@ -33,4 +36,7 @@ public class TransactionRequest {
 
     @JsonProperty("to_bank")
     private String toBank;
+
+    @JsonProperty("otp")
+    private String otp;
 }

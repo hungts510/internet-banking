@@ -5,6 +5,7 @@ public class Constant {
     public static final String DEFAULT_PASSWORD = "123456aA@";
     public static final long OTP_AVAILABLE_TIME = 5*60*1000;
     public static final String BANK_NAME = "30Bank";
+    public static final String SDF_FORMAT = "yyyy/MM/dd HH:mm:ss";
 
     public static final class AccountType {
         public static final Integer SPEND_ACCOUNT = 1;
@@ -27,6 +28,7 @@ public class Constant {
         public static final int TRANSFER = 1;
         public static final int DEBT = 2;
         public static final int PAY_IN = 3;
+        public static final int ALL = 4;
     }
 
     public static final class TransactionStatus {
@@ -41,5 +43,11 @@ public class Constant {
         public static final String USERNAME = "hungtspubg@gmail.com";
         public static final String PASSWORD = "Tau0biet";
         public static final String SUBJECT_RESET_EMAIL = "Group 30 Internet Banking - Email reset mật khẩu";
+        public static final String SUBJECT_TRANSFER_EMAIL = "Group 30 Internet Banking - Xác nhận giao dịch";
+    }
+
+    public static final class UserRole {
+        public static final Integer ROLE_CUSTOMER = 1;
+        public static final Integer ROLE_EMPLOYEE = 2;
     }
 }

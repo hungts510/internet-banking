@@ -22,5 +22,16 @@ public class ContextPath {
         public static final String INFO = "/info";
         public static final String PAY_IN = "/pay-in";
         public static final String TRANSFER = "/transfer";
+        public static final String CAPTURE_TRANSFER = "/capture-transfer";
+        public static final String LIST_TRANSACTIONS = "/list-transactions";
+    }
+
+    public static final class Employee {
+        public static final String EMPLOYEE = "/employee";
+        public static final String CREATE = "/create";
+        public static final String INFO = "/info";
+        public static final String UPDATE = "/update";
+        public static final String DELETE = "/delete";
+        public static final String LIST_EMPLOYEE = "/list-employee";
     }
 }

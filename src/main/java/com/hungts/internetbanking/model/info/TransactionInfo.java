@@ -12,32 +12,44 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
-public class DebtorInfo {
-    @JsonProperty(value = "debtor_id")
+public class TransactionInfo {
+    @JsonProperty("transaction_id")
     private Integer id;
 
-    @JsonProperty(value = "user_id")
-    private Integer userId;
+    @JsonProperty("from_user_id")
+    private Integer fromUserId;
 
-    @JsonProperty(value = "debtor_account_number")
-    private Long debtorAccountNumber;
+    @JsonProperty("to_user_id")
+    private Integer toUserId;
 
-    @JsonProperty(value = "amount")
+    @JsonProperty("from_account_number")
+    private Long fromAccountNumber;
+
+    @JsonProperty("to_account_number")
+    private Long toAccountNumber;
+
+    @JsonProperty("amount")
     private Long amount;
 
-    @JsonProperty(value = "description")
+    @JsonProperty("type")
+    private Integer type;
+
+    @JsonProperty("description")
     private String description;
 
-    @JsonProperty(value = "created_at")
+    @JsonProperty("created_at")
     @JsonSerialize(using = CustomDateSerializer.class)
     @JsonDeserialize(using = CustomDateDeSerializer.class)
     private Date createdAt;
 
-    @JsonProperty(value = "updated_at")
+    @JsonProperty("updated_at")
     @JsonSerialize(using = CustomDateSerializer.class)
     @JsonDeserialize(using = CustomDateDeSerializer.class)
     private Date updatedAt;
 
-    @JsonProperty(value = "status")
-    private Integer status;
+    @JsonProperty("fromBank")
+    private String fromBank;
+
+    @JsonProperty("toBank")
+    private String toBank;
 }

@@ -4,6 +4,8 @@ import com.hungts.internetbanking.model.entity.User;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Mapper
 @Repository
 public interface UserRepository {
@@ -19,4 +21,7 @@ public interface UserRepository {
 
     @Update("UPDATE user SET password = #{newPassword} WHERE id = #{userId}")
     void updatePassword(int userId, String newPassword);
+
+    @Select("SELECT user.* FROM user, user_role WHERE user.id = user_role.user_id AND role_id = 2")
+    List<User> getListEmployee();
 }

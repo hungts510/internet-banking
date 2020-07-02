@@ -2,6 +2,7 @@ package com.hungts.internetbanking.repository;
 
 import com.hungts.internetbanking.model.entity.Account;
 import org.apache.ibatis.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -42,6 +43,10 @@ public interface AccountRepository {
             @Result(column = "updated_at", property = "updatedAt")
     })
     Account getCustomerAccountByAccountNumber(long accountNumber);
+
+    @ResultMap("AccountObject")
+    @Select("SELECT * FROM account WHERE account_number = #{accountNumber}")
+    Account getAccountFullInfoByAccountNumber(long accountNumber);
 
     @Select("SELECT * FROM account WHERE user_id = #{userId} AND account_type = #{accountType}")
     @ResultMap("AccountObject")

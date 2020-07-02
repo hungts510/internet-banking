@@ -33,4 +33,6 @@ public class Transaction {
     private String fromBank;
 
     private String toBank;
+
+    private String otp;
 }

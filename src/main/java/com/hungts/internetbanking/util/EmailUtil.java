@@ -45,8 +45,7 @@ public class EmailUtil {
     }
 
     public static void sendResetPasswordEmail(UserInfo userInfo, String otp) {
-
-        String message = "Xin chào, " + userInfo.getFullName() + "<br>";
+        String message = "Xin chào, " + userInfo.getFullName() + ".<br>";
         message += "<b>Mã OTP sử dụng để reset mật khẩu của bạn là: </b><br>";
         message += "<h2>" + otp + "</h2>";
         message += "Mã OTP có hiệu lực trong vòng 5 phút.<br>";
@@ -55,7 +54,22 @@ public class EmailUtil {
         try {
             sendHtmlEmail(userInfo.getEmail(), Constant.EmailConfig.SUBJECT_RESET_EMAIL, message);
         } catch (Exception e) {
-            throw new EzException("Send reset email fail" + e.getMessage());
+            throw new EzException("Send reset email fail:" + e.getMessage());
+        }
+    }
+
+    public static void sendTransferOTP(UserInfo userInfo, long amount, String otp) {
+        String message = "Xin chào, " + userInfo.getFullName() + ".<br>";
+        message += "<b>Bạn đang thực hiện một giao dịch chuyển tiền. Tài khoản của bạn sẽ bị trừ: " + amount + "đ. </b><br>";
+        message += "<b>Mã OTP sử dụng để xác nhận giao dịch của bạn là: </b><br>";
+        message += "<h2>" + otp + "</h2>";
+        message += "Mã OTP có hiệu lực trong vòng 5 phút.<br>";
+        message += "Để đảm bảo an toàn. Vui lòng không chia sẻ mã này cho người khác!";
+
+        try {
+            sendHtmlEmail(userInfo.getEmail(), Constant.EmailConfig.SUBJECT_TRANSFER_EMAIL, message);
+        } catch (Exception e) {
+            throw new EzException("Send transfer email fail: " + e.getMessage());
         }
     }
 }

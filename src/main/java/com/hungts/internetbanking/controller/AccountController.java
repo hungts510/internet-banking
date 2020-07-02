@@ -4,6 +4,8 @@ import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.model.info.AccountInfo;
+import com.hungts.internetbanking.model.info.TransactionInfo;
+import com.hungts.internetbanking.model.info.TransactionMetaData;
 import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.TransactionRequest;
 import com.hungts.internetbanking.model.response.EzResponse;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(ContextPath.Account.ACCOUNT)
@@ -68,13 +72,45 @@ public class AccountController {
         }
 
         if (StringUtils.isBlank(transactionRequest.getFromBank()) || StringUtils.isBlank(transactionRequest.getToBank())
-                || !transactionRequest.getFromBank().equals(transactionRequest.getToBank()) || transactionRequest.getFromBank().equals(Constant.BANK_NAME)
+                || !transactionRequest.getFromBank().equals(transactionRequest.getToBank()) || !transactionRequest.getFromBank().equals(Constant.BANK_NAME)
                 || !transactionRequest.getToBank().equals(Constant.BANK_NAME)) {
             throw new EzException("API just for internal transfer purpose");
         }
 
-        accountService.transferMoney(transactionRequest);
+        TransactionInfo transactionInfo = accountService.createTransferMoneyTransaction(transactionRequest);
+        ResponseBody responseBody = new ResponseBody(0, "Success", transactionInfo);
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.Account.CAPTURE_TRANSFER, method = RequestMethod.POST)
+    public ResponseEntity<?> captureTransfer(@RequestBody TransactionRequest transactionRequest) {
+        if (transactionRequest.getTransactionId() == null || transactionRequest.getTransactionId() <= 0) {
+            throw new EzException("Missing transaction id");
+        }
+
+        if (StringUtils.isBlank(transactionRequest.getOtp()) || Integer.parseInt(transactionRequest.getOtp()) <= 0) {
+            throw new EzException("Missing destination account number");
+        }
+
+        accountService.captureTransferTransaction(transactionRequest);
         ResponseBody responseBody = new ResponseBody(0, "Success");
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @RequestMapping(value = ContextPath.Account.LIST_TRANSACTIONS, method = RequestMethod.POST)
+    public ResponseEntity<?> listTransactions(@RequestBody AccountRequest accountRequest) {
+        if (accountRequest.getAccountNumber() == null || accountRequest.getAccountNumber() <= 0) {
+            throw new EzException("Missing account number");
+        }
+
+        if (accountRequest.getTransactionType() == null || accountRequest.getTransactionType() <= 0) {
+            throw new EzException("Missing transaction type");
+        }
+
+        TransactionMetaData transactionMetaData = accountService.getListAccountTransaction(accountRequest);
+        ResponseBody responseBody = new ResponseBody(0, "Success", transactionMetaData);
         return EzResponse.response(responseBody);
     }
 }

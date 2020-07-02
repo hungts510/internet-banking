@@ -16,4 +16,7 @@ public class AccountRequest {
 
     @JsonProperty(value = "account_name")
     private String accountName;
+
+    @JsonProperty(value = "transaction_type")
+    private Integer transactionType;
 }

@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         accountRequest.setAccountType(Constant.AccountType.SPEND_ACCOUNT);
         AccountInfo accountInfo = accountService.createAccount(accountRequest);
 
-        roleRepository.saveUserRole(insertUser.getId(), 1);
+        roleRepository.saveUserRole(insertUser.getId(), Constant.UserRole.ROLE_CUSTOMER);
 
         return userMapper.userToUserInfo(insertUser);
     }
