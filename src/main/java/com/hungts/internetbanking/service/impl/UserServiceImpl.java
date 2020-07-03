@@ -17,6 +17,7 @@ import com.hungts.internetbanking.service.AccountService;
 import com.hungts.internetbanking.service.UserService;
 import com.hungts.internetbanking.util.EmailUtil;
 import com.hungts.internetbanking.util.EncryptPasswordUtils;
+import com.hungts.internetbanking.util.JwtTokenUtil;
 import com.hungts.internetbanking.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -181,7 +182,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void resetPassword(String email, String otp) {
+    public String resetPassword(String email, String otp) {
         UserInfo userInfo = findUserByEmail(email);
 
         if (userInfo == null) {
@@ -199,6 +200,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         String encryptDefaultPassword = EncryptPasswordUtils.encryptPassword(Constant.DEFAULT_PASSWORD);
         userRepository.updatePassword(userInfo.getUserId(), encryptDefaultPassword);
+        final UserDetails userDetails = loadUserByUsername(userInfo.getPhone());
+        final String token = JwtTokenUtil.generateToken(userDetails);
+        return token;
     }
 
     @Override
@@ -321,5 +325,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         return transactionMapper.transactionToTransactionInfo(transaction);
+    }
+
+    @Override
+    public UserInfo getUserById(Integer userId) {
+        User user = userRepository.getUserById(userId);
+
+        if (user == null) {
+            throw new EzException("User does not exist");
+        }
+
+        return userMapper.userToUserInfo(user);
     }
 }

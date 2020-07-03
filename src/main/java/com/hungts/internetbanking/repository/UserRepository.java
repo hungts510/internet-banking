@@ -24,4 +24,7 @@ public interface UserRepository {
 
     @Select("SELECT user.* FROM user, user_role WHERE user.id = user_role.user_id AND role_id = 2")
     List<User> getListEmployee();
+
+    @Select("SELECT * FROM user WHERE id = #{userId}")
+    User getUserById(int userId);
 }

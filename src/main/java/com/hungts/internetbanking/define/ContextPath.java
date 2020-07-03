@@ -36,4 +36,10 @@ public class ContextPath {
         public static final String DELETE = "/delete";
         public static final String LIST_EMPLOYEE = "/list-employee";
     }
+
+    public static final class Api {
+        public static final String API = "/api";
+        public static final String ACCOUNT = "/account";
+        public static final String INFO = "/info";
+    }
 }

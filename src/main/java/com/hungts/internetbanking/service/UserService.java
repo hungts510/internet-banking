@@ -20,7 +20,7 @@ public interface UserService {
 
     void sendEmailResetPassword(String email);
 
-    void resetPassword(String email, String otp);
+    String resetPassword(String email, String otp);
 
     DebtorInfo saveDebtor(DebtorRequest debtorRequest);
 
@@ -31,4 +31,6 @@ public interface UserService {
     void cancelDebt(DebtorRequest debtorRequest);
 
     TransactionInfo payDebt(DebtorRequest debtorRequest);
+
+    UserInfo getUserById(Integer userId);
 }

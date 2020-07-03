@@ -172,8 +172,8 @@ public class UserController {
             throw new EzException("Missing otp");
         }
 
-        userService.resetPassword(changePasswordRequest.getEmail(), changePasswordRequest.getOtp());
-        ResponseBody responseBody = new ResponseBody(0, "Success");
+        String newToken = userService.resetPassword(changePasswordRequest.getEmail(), changePasswordRequest.getOtp());
+        ResponseBody responseBody = new ResponseBody(0, "Success", newToken);
         return EzResponse.response(responseBody);
     }
 

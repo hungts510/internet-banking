@@ -90,7 +90,12 @@ public class AccountServiceImpl implements AccountService {
             throw new EzException("Account does not exist!");
         }
 
-        return new AccountInfo(account);
+        UserInfo userInfo = userService.getUserById(account.getUserId());
+
+        AccountInfo accountInfo = new AccountInfo(account);
+        accountInfo.setAccountName(userInfo.getFullName());
+
+        return accountInfo;
     }
 
     @Override
