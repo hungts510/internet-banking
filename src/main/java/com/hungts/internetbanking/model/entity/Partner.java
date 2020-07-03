@@ -14,6 +14,8 @@ public class Partner {
 
     private String partnerCode;
 
+    private String partnerType;
+
     private Date createdAt;
 
     private Date updatedAt;

@@ -58,7 +58,17 @@ public class Constant {
         }
     }
 
-    static final String SOURCE_PUBLIC_KEYS = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +
+    public static final class PartnerType {
+        public static final String PGP = "PGP";
+        public static final String RSA = "RSA";
+    }
+
+    public static final String SOURCE_PASS_PHRASE = "12345";
+    public static final String DEST_PASS_PHRASE = "123456";
+    public static final String SOURCE_USER_EMAIL = "hungts@test.com";
+    public static final String DEST_USER_EMAIL = "hungtsdest@test.com";
+
+    public static final String SOURCE_PUBLIC_KEYS = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +
             "Version: Keybase OpenPGP v1.0.0\n" +
             "Comment: https://keybase.io/crypto\n" +
             "\n" +
@@ -114,7 +124,7 @@ public class Constant {
             "=o6oi\n" +
             "-----END PGP PUBLIC KEY BLOCK-----\n";
 
-    static final String SOURCE_PRIVATE_KEYS = "-----BEGIN PGP PRIVATE KEY BLOCK-----\n" +
+    public static final String SOURCE_PRIVATE_KEYS = "-----BEGIN PGP PRIVATE KEY BLOCK-----\n" +
             "Version: Keybase OpenPGP v1.0.0\n" +
             "Comment: https://keybase.io/crypto\n" +
             "\n" +
@@ -213,7 +223,7 @@ public class Constant {
             "=KEdT\n" +
             "-----END PGP PRIVATE KEY BLOCK-----\n";
 
-    static final String DEST_PRIVATE_KEYS = "-----BEGIN PGP PRIVATE KEY BLOCK-----\n" +
+    public static final String DEST_PRIVATE_KEYS = "-----BEGIN PGP PRIVATE KEY BLOCK-----\n" +
             "Version: Keybase OpenPGP v1.0.0\n" +
             "Comment: https://keybase.io/crypto\n" +
             "\n" +
@@ -312,7 +322,7 @@ public class Constant {
             "=1VZe\n" +
             "-----END PGP PRIVATE KEY BLOCK-----\n";
 
-    static final String DEST_PUBLIC_KEYS = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +
+    public static final String DEST_PUBLIC_KEYS = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +
             "Version: Keybase OpenPGP v1.0.0\n" +
             "Comment: https://keybase.io/crypto\n" +
             "\n" +

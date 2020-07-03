@@ -5,6 +5,8 @@ import lombok.Data;
 
 @Data
 public class ExternalRequest {
+    @JsonProperty(value = "message")
+    private String message;
 
     @JsonProperty(value = "account_number")
     private Long accountNumber;

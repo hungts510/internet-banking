@@ -41,5 +41,7 @@ public class ContextPath {
         public static final String API = "/api";
         public static final String ACCOUNT = "/account";
         public static final String INFO = "/info";
+        public static final String GENERATE_MESSAGE = "/generate-message";
+        public static final String RECHARGE = "/recharge";
     }
 }

@@ -55,7 +55,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors().and().csrf().disable()
-                .authorizeRequests().antMatchers("/authenticate", "/user/forgot-password", "/user/reset-password").permitAll().
+                .authorizeRequests().antMatchers("/authenticate", "/user/forgot-password", "/user/reset-password",
+                "/api/account/info", "/api/account/generate-message", "/api/account/recharge")
+                .permitAll().
                 anyRequest().authenticated().and().
                 exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

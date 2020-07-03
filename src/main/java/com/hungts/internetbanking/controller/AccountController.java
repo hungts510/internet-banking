@@ -26,7 +26,7 @@ public class AccountController {
     @Autowired
     AccountService accountService;
 
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_EMPLOYEE')")
     @RequestMapping(value = ContextPath.Account.INFO, method = RequestMethod.POST)
     public ResponseEntity<?> getAccountInfo(@RequestBody AccountRequest accountRequest) {
         if (accountRequest.getAccountNumber() == null || accountRequest.getAccountNumber() <= 0) {

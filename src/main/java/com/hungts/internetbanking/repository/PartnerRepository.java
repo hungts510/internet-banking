@@ -17,6 +17,7 @@ public interface PartnerRepository {
             @Result(column = "id", property = "id", id = true),
             @Result(column = "partner_name", property = "partnerName"),
             @Result(column = "partner_code", property = "partnerCode"),
+            @Result(column = "partner_type", property = "partnerType"),
             @Result(column = "created_at", property = "createdAt"),
             @Result(column = "updated_at", property = "updatedAt")
     })
