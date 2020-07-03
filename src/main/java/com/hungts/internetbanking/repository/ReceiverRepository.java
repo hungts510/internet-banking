@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
 
 @Repository
 @Mapper
@@ -32,4 +33,8 @@ public interface ReceiverRepository {
 
     @Delete("DELETE FROM receiver WHERE id = #{receiverId}")
     void deleteReceiver(int receiverId);
+
+    @Select("SELECT * FROM receiver WHERE user_id = #{userId}")
+    @ResultMap("ReceiverObject")
+    List<Receiver> getListReceiverByUserId(int userId);
 }

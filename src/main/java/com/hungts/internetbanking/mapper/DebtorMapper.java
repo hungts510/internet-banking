@@ -19,7 +19,8 @@ public interface DebtorMapper {
             @Mapping(target = "description", source = "description"),
             @Mapping(target = "createdAt", source = "createdAt"),
             @Mapping(target = "updatedAt", source = "updatedAt"),
-            @Mapping(target = "status", source = "status")
+            @Mapping(target = "status", source = "status"),
+            @Mapping(target = "receiverName", source = "receiverName"),
     })
     DebtorInfo debtorToDebtorInfo(Debtor debtor);
 }

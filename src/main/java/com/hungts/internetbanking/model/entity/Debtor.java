@@ -23,4 +23,6 @@ public class Debtor {
     private Date updatedAt;
 
     private Integer status;
+
+    private String receiverName;
 }

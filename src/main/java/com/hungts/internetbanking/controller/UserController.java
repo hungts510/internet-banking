@@ -3,10 +3,7 @@ package com.hungts.internetbanking.controller;
 import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
-import com.hungts.internetbanking.model.info.AccountInfo;
-import com.hungts.internetbanking.model.info.DebtorInfo;
-import com.hungts.internetbanking.model.info.TransactionInfo;
-import com.hungts.internetbanking.model.info.UserInfo;
+import com.hungts.internetbanking.model.info.*;
 import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.ChangePasswordRequest;
 import com.hungts.internetbanking.model.request.DebtorRequest;
@@ -80,6 +77,14 @@ public class UserController {
 
         receiverService.createReceiver(accountRequest);
         ResponseBody responseBody = new ResponseBody(0, "Success");
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.User.LIST_RECEIVER, method = RequestMethod.GET)
+    public ResponseEntity<?> listReceiver() {
+        List<ReceiverInfo> receiverInfoList = receiverService.getListReceiverByUser();
+        ResponseBody responseBody = new ResponseBody(0, "Success", receiverInfoList);
         return EzResponse.response(responseBody);
     }
 

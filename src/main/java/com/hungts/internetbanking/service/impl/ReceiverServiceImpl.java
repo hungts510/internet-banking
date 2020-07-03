@@ -1,7 +1,9 @@
 package com.hungts.internetbanking.service.impl;
 
 import com.hungts.internetbanking.exception.EzException;
+import com.hungts.internetbanking.mapper.ReceiverMapper;
 import com.hungts.internetbanking.model.entity.Receiver;
+import com.hungts.internetbanking.model.info.ReceiverInfo;
 import com.hungts.internetbanking.model.info.UserInfo;
 import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.repository.ReceiverRepository;
@@ -13,6 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReceiverServiceImpl implements ReceiverService {
@@ -21,6 +25,9 @@ public class ReceiverServiceImpl implements ReceiverService {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    ReceiverMapper receiverMapper;
 
     @Override
     public void createReceiver(AccountRequest accountRequest) {
@@ -42,6 +49,20 @@ public class ReceiverServiceImpl implements ReceiverService {
         receiver.setUpdatedAt(currentDate);
 
         receiverRepository.saveReceiver(receiver);
+    }
+
+    @Override
+    public List<ReceiverInfo> getListReceiverByUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+
+        UserInfo userInfo = userService.findUserByPhoneNumber(phoneNumber);
+        if (userInfo == null) {
+            throw new EzException("User not exist");
+        }
+
+        List<Receiver> receiverList = receiverRepository.getListReceiverByUserId(userInfo.getUserId());
+        return receiverList.stream().map(receiver -> receiverMapper.receiverToReceiverInfo(receiver)).collect(Collectors.toList());
     }
 
     @Override

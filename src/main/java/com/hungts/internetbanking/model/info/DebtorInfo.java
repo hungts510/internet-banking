@@ -40,4 +40,7 @@ public class DebtorInfo {
 
     @JsonProperty(value = "status")
     private Integer status;
+
+    @JsonProperty(value = "receiver_name")
+    private String receiverName;
 }
