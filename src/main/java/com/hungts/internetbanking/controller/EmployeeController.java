@@ -33,7 +33,16 @@ public class EmployeeController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = ContextPath.Employee.UPDATE, method = RequestMethod.POST)
     public ResponseEntity<?> updateUser(@RequestBody UserRequest userRequest) {
-        employeeService.updateEmployee(userRequest);
+        UserInfo userInfo = employeeService.updateEmployee(userRequest);
+
+        ResponseBody responseBody = new ResponseBody(0, "Success", userInfo);
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @RequestMapping(value = ContextPath.Employee.DELETE, method = RequestMethod.POST)
+    public ResponseEntity<?> deleteUser(@RequestBody UserRequest userRequest) {
+        employeeService.deleteEmployee(userRequest);
 
         ResponseBody responseBody = new ResponseBody(0, "Success");
         return EzResponse.response(responseBody);

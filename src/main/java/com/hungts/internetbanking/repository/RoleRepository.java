@@ -17,4 +17,7 @@ public interface RoleRepository {
     @Insert("INSERT INTO user_role(user_id, role_id) VALUES(#{userId}, #{roleId})")
     @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Integer.class)
     void saveUserRole(int userId, int roleId);
+
+    @Update("UPDATE user_role SET role_id = #{roleId} WHERE user_id = #{userId}")
+    void updateUserRole(int userId, int roleId);
 }

@@ -49,6 +49,8 @@ public class Constant {
     public static final class UserRole {
         public static final Integer ROLE_CUSTOMER = 1;
         public static final Integer ROLE_EMPLOYEE = 2;
+        public static final Integer ROLE_ADMIN = 3;
+        public static final Integer ROLE_DISABLE = 4;
     }
 
     public static final class ExternalRequest {

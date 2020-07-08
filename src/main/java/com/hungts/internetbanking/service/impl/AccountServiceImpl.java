@@ -241,6 +241,16 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public TransactionMetaData getListAccountTransaction(AccountRequest accountRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+        UserInfo userInfo = userService.findUserByPhoneNumber(phoneNumber);
+        if (userInfo.getRole().equals(Constant.UserRole.ROLE_CUSTOMER)) {
+            Account account = accountRepository.getUserAccountByType(userInfo.getUserId(), Constant.AccountType.SPEND_ACCOUNT);
+            if (!account.getAccountNumber().equals(accountRequest.getAccountNumber())) {
+                throw new EzException("Account number invalid");
+            }
+        }
+
         TransactionMetaData transactionMetaData = new TransactionMetaData();
         Account userAccount = accountRepository.getCustomerAccountByAccountNumber(accountRequest.getAccountNumber());
 

@@ -17,8 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @CrossOrigin(maxAge = 3600)
 @RestController
 @RequestMapping(ContextPath.Account.ACCOUNT)
@@ -96,7 +94,7 @@ public class AccountController {
         return EzResponse.response(responseBody);
     }
 
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_CUSTOMER')")
     @RequestMapping(value = ContextPath.Account.LIST_TRANSACTIONS, method = RequestMethod.POST)
     public ResponseEntity<?> listTransactions(@RequestBody AccountRequest accountRequest) {
         if (accountRequest.getAccountNumber() == null || accountRequest.getAccountNumber() <= 0) {

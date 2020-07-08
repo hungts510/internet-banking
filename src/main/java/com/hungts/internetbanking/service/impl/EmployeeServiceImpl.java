@@ -4,7 +4,6 @@ import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.mapper.UserMapper;
 import com.hungts.internetbanking.model.entity.User;
-import com.hungts.internetbanking.model.info.AccountInfo;
 import com.hungts.internetbanking.model.info.UserInfo;
 import com.hungts.internetbanking.model.request.UserRequest;
 import com.hungts.internetbanking.repository.RoleRepository;
@@ -13,12 +12,12 @@ import com.hungts.internetbanking.service.EmployeeService;
 import com.hungts.internetbanking.service.UserService;
 import com.hungts.internetbanking.util.EncryptPasswordUtils;
 import com.hungts.internetbanking.util.Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,17 +60,48 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         roleRepository.saveUserRole(insertUser.getId(), Constant.UserRole.ROLE_EMPLOYEE);
 
-        return userMapper.userToUserInfo(insertUser);
+        UserInfo userInfo = userMapper.userToUserInfo(insertUser);
+        userInfo.setRole(Constant.UserRole.ROLE_EMPLOYEE);
+        return userInfo;
     }
 
     @Override
-    public void updateEmployee(UserRequest userRequest) {
+    public UserInfo updateEmployee(UserRequest userRequest) {
+        if (userRequest.getUserId() == null || userRequest.getUserId() <= 0) {
+            throw new EzException("Mising user id");
+        }
 
+        User currentUser = userRepository.getUserById(userRequest.getUserId());
+        if (currentUser == null) {
+            throw new EzException("User does not exist");
+        }
+
+        if (StringUtils.isNotBlank(userRequest.getFullname())) {
+            currentUser.setFullName(userRequest.getFullname());
+        }
+
+        if (StringUtils.isNotBlank(userRequest.getPassword())) {
+            currentUser.setPassword(EncryptPasswordUtils.encryptPassword(userRequest.getPassword()));
+        }
+
+        userRepository.updateUser(currentUser);
+        UserInfo userInfo = userMapper.userToUserInfo(currentUser);
+        userInfo.setRole(Constant.UserRole.ROLE_EMPLOYEE);
+        return userInfo;
     }
 
     @Override
     public void deleteEmployee(UserRequest userRequest) {
+        if (userRequest.getUserId() == null || userRequest.getUserId() <= 0) {
+            throw new EzException("Mising user id");
+        }
 
+        User currentUser = userRepository.getUserById(userRequest.getUserId());
+        if (currentUser == null) {
+            throw new EzException("User does not exist");
+        }
+
+        roleRepository.updateUserRole(currentUser.getId(), 4);
     }
 
     @Override

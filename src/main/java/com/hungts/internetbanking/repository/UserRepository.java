@@ -27,4 +27,7 @@ public interface UserRepository {
 
     @Select("SELECT * FROM user WHERE id = #{userId}")
     User getUserById(int userId);
+
+    @Update("UPDATE user SET fullname = #{fullName}, password = #{password} WHERE id = #{id}")
+    void updateUser(User user);
 }
