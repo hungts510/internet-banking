@@ -43,4 +43,7 @@ public class DebtorInfo {
 
     @JsonProperty(value = "receiver_name")
     private String receiverName;
+
+    @JsonProperty(value = "reveiver_account_number")
+    private Long receiverAccountNumber;
 }

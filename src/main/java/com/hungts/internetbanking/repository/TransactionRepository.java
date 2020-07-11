@@ -39,11 +39,11 @@ public interface TransactionRepository {
     @Update("UPDATE transactions SET status = #{status} WHERE id = #{transactionId}")
     void updateTransactionStatus(int status, int transactionId);
 
-    @Select("SELECT * FROM transactions WHERE type = #{type} AND from_account_number = #{fromAccountNumber} ORDER BY created_at DESC")
+    @Select("SELECT * FROM transactions WHERE type = #{type} AND from_account_number = #{fromAccountNumber} AND type != 2 ORDER BY created_at DESC")
     @ResultMap("TransactionObject")
     List<Transaction> getListTransactionByTypeFromAccount(int type, long fromAccountNumber);
 
-    @Select("SELECT * FROM transactions WHERE to_account_number = #{toAccountNumber} ORDER BY created_at DESC")
+    @Select("SELECT * FROM transactions WHERE to_account_number = #{toAccountNumber} AND type != 2 ORDER BY created_at DESC")
     @ResultMap("TransactionObject")
     List<Transaction> getListTransactionByTypeToAccount(long toAccountNumber);
 }

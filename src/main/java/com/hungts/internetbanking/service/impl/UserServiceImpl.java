@@ -239,8 +239,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new EzException("User does not exist");
         }
 
+        Account account = accountRepository.getUserAccountByType(userInfo.getUserId(), 1);
+
         List<Debtor> debtorList = debtorRepository.getListDebtorsByUserId(userInfo.getUserId());
-        List<DebtorInfo> debtorInfoList = debtorList.stream().map(debtor -> debtorMapper.debtorToDebtorInfo(debtor)).collect(Collectors.toCollection(LinkedList::new));
+        List<DebtorInfo> debtorInfoList = new LinkedList<>();
+        for (Debtor debtor : debtorList) {
+            DebtorInfo debtorInfo = debtorMapper.debtorToDebtorInfo(debtor);
+            debtorInfo.setReceiverName(userInfo.getFullName());
+            debtorInfo.setReceiverAccountNumber(account.getAccountNumber());
+            debtorInfoList.add(debtorInfo);
+        }
         return debtorInfoList;
     }
 
@@ -256,7 +264,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         Account spendAccount = accountRepository.getUserAccountByType(userInfo.getUserId(), Constant.AccountType.SPEND_ACCOUNT);
         List<Debtor> debtorList = debtorRepository.getListDebtsByAccountNumber(spendAccount.getAccountNumber());
-        List<DebtorInfo> debtorInfoList = debtorList.stream().map(debtor -> debtorMapper.debtorToDebtorInfo(debtor)).collect(Collectors.toCollection(LinkedList::new));
+        List<DebtorInfo> debtorInfoList = new LinkedList<>();
+        for (Debtor debtor : debtorList) {
+            DebtorInfo debtorInfo = debtorMapper.debtorToDebtorInfo(debtor);
+            Account account = accountRepository.getUserAccountByType(debtorInfo.getUserId(), Constant.AccountType.SPEND_ACCOUNT);
+            debtorInfo.setReceiverAccountNumber(account.getAccountNumber());
+            debtorInfoList.add(debtorInfo);
+        }
         return debtorInfoList;
     }
 
