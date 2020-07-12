@@ -2,6 +2,7 @@ package com.hungts.internetbanking.service;
 
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.model.info.DebtorInfo;
+import com.hungts.internetbanking.model.info.NotificationInfo;
 import com.hungts.internetbanking.model.info.TransactionInfo;
 import com.hungts.internetbanking.model.info.UserInfo;
 import com.hungts.internetbanking.model.request.DebtorRequest;
@@ -33,4 +34,6 @@ public interface UserService {
     TransactionInfo payDebt(DebtorRequest debtorRequest);
 
     UserInfo getUserById(Integer userId);
+
+    List<NotificationInfo> getListUserNotification(Integer userId);
 }

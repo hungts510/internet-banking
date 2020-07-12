@@ -3,6 +3,7 @@ package com.hungts.internetbanking.controller;
 import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
+import com.hungts.internetbanking.model.entity.Notification;
 import com.hungts.internetbanking.model.info.*;
 import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.ChangePasswordRequest;
@@ -246,6 +247,23 @@ public class UserController {
         TransactionInfo transactionInfo = userService.payDebt(debtorRequest);
 
         ResponseBody responseBody = new ResponseBody(0, "Success", transactionInfo);
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.User.GET_NOTIFICATION, method = RequestMethod.GET)
+    public ResponseEntity<?> getNotification() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+
+        UserInfo userInfo = userService.findUserByPhoneNumber(phoneNumber);
+        if (userInfo == null) {
+            throw new EzException("User does not exist");
+        }
+
+        List<NotificationInfo> notificationInfoList = userService.getListUserNotification(userInfo.getUserId());
+
+        ResponseBody responseBody = new ResponseBody(0, "Success", notificationInfoList);
         return EzResponse.response(responseBody);
     }
 }

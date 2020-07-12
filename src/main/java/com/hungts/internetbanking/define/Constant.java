@@ -36,6 +36,11 @@ public class Constant {
         public static final int FAIL = 1;
         public static final int PENDING = 2;
     }
+    
+    public static final class NotificationStatus {
+        public static final int NOT_READ = 0;
+        public static final int READ = 1;
+    }
 
     public static final class EmailConfig {
         public static final String HOST = "smtp.gmail.com";

@@ -3,13 +3,11 @@ package com.hungts.internetbanking.service.impl;
 import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.mapper.DebtorMapper;
+import com.hungts.internetbanking.mapper.NotificationMapper;
 import com.hungts.internetbanking.mapper.TransactionMapper;
 import com.hungts.internetbanking.mapper.UserMapper;
 import com.hungts.internetbanking.model.entity.*;
-import com.hungts.internetbanking.model.info.AccountInfo;
-import com.hungts.internetbanking.model.info.DebtorInfo;
-import com.hungts.internetbanking.model.info.TransactionInfo;
-import com.hungts.internetbanking.model.info.UserInfo;
+import com.hungts.internetbanking.model.info.*;
 import com.hungts.internetbanking.model.request.DebtorRequest;
 import com.hungts.internetbanking.model.request.UserRequest;
 import com.hungts.internetbanking.repository.*;
@@ -65,6 +63,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Autowired
     TransactionMapper transactionMapper;
+
+    @Autowired
+    NotificationRepository notificationRepository;
+
+    @Autowired
+    NotificationMapper notificationMapper;
 
     @Override
     public UserInfo createUser(UserRequest userRequest) throws EzException {
@@ -281,7 +285,39 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new EzException("Debtor does not exist");
         }
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+        UserInfo userInfo = findUserByPhoneNumber(phoneNumber);
+
+        Account account = accountRepository.getUserAccountByType(userInfo.getUserId(), Constant.AccountType.SPEND_ACCOUNT);
+
+        if (account == null) {
+            throw new EzException("Debtor account does not exist");
+        }
+
+        if (!debtor.getUserId().equals(userInfo.getUserId()) && !account.getAccountNumber().equals(debtor.getDebtorAccountNumber())) {
+            throw new EzException("Debtor not belong to this user");
+        }
+
         debtorRepository.updateDebtorById(debtor.getId(), debtorRequest.getDescription(), new Date(), Constant.DebtStatus.CANCEL);
+        Notification notification = new Notification();
+        notification.setCreatedAt(new Date());
+        notification.setUpdatedAt(new Date());
+        notification.setDebtorId(debtor.getId());
+        notification.setStatus(Constant.NotificationStatus.NOT_READ);
+
+        if (debtor.getUserId().equals(userInfo.getUserId())) {
+            Account debtorAccount = accountRepository.getCustomerAccountByAccountNumber(debtor.getDebtorAccountNumber());
+            notification.setFromUserId(userInfo.getUserId());
+            notification.setToUserId(debtorAccount.getUserId());
+            notification.setContent("Bạn có một nhắc nợ từ tài khoản: " + account.getAccountNumber() + " vừa được hủy!");
+        } else if (account.getAccountNumber().equals(debtor.getDebtorAccountNumber())) {
+            notification.setFromUserId(account.getUserId());
+            notification.setToUserId(debtor.getUserId());
+            notification.setContent("Tài khoản " + account.getAccountNumber() + " vừa hủy một nhắc nợ do bạn tạo!");
+        }
+
+        notificationRepository.saveNotification(notification);
     }
 
     @Override
@@ -350,5 +386,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         return userMapper.userToUserInfo(user);
+    }
+
+    @Override
+    public List<NotificationInfo> getListUserNotification(Integer userId) {
+        List<Notification> notificationList = notificationRepository.getListUserNotification(userId);
+
+        return notificationList.stream().map(notification -> notificationMapper.notificationToNotificationInfo(notification)).collect(Collectors.toList());
     }
 }
