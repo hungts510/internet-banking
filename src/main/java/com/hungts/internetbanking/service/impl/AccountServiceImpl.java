@@ -4,6 +4,7 @@ import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.mapper.TransactionMapper;
 import com.hungts.internetbanking.model.entity.Account;
+import com.hungts.internetbanking.model.entity.Notification;
 import com.hungts.internetbanking.model.entity.Transaction;
 import com.hungts.internetbanking.model.info.AccountInfo;
 import com.hungts.internetbanking.model.info.TransactionInfo;
@@ -13,6 +14,7 @@ import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.TransactionRequest;
 import com.hungts.internetbanking.repository.AccountRepository;
 import com.hungts.internetbanking.repository.DebtorRepository;
+import com.hungts.internetbanking.repository.NotificationRepository;
 import com.hungts.internetbanking.repository.TransactionRepository;
 import com.hungts.internetbanking.service.AccountService;
 import com.hungts.internetbanking.service.UserService;
@@ -45,6 +47,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     TransactionMapper transactionMapper;
+
+    @Autowired
+    NotificationRepository notificationRepository;
 
     @Override
     public AccountInfo createAccount(AccountInfo accountRequest) {
@@ -234,8 +239,16 @@ public class AccountServiceImpl implements AccountService {
         transactionRepository.updateTransactionStatus(Constant.TransactionStatus.SUCCESS, transaction.getId());
 
         if (transaction.getDebtId() != null && transaction.getDebtId() > 0) {
-            String description = "PAID - Transaction id: " + transaction.getId();
-            debtorRepository.updateDebtorById(transaction.getDebtId(), description, new Date(), Constant.DebtStatus.PAID);
+            debtorRepository.updateDebtorById(transaction.getDebtId(), transaction.getDescription(), new Date(), Constant.DebtStatus.PAID);
+            Notification notification = new Notification();
+            notification.setCreatedAt(new Date());
+            notification.setUpdatedAt(new Date());
+            notification.setDebtorId(transaction.getDebtId());
+            notification.setStatus(Constant.NotificationStatus.NOT_READ);
+            notification.setFromUserId(userInfo.getUserId());
+            notification.setToUserId(transaction.getToUserId());
+            notification.setContent("Tài khoản " + transaction.getFromAccountNumber() + " vừa thanh toán một nhắc nợ do bạn tạo!");
+            notificationRepository.saveNotification(notification);
         }
     }
 
@@ -265,14 +278,14 @@ public class AccountServiceImpl implements AccountService {
             List<Transaction> transactions = transactionRepository.getListTransactionByTypeFromAccount(Constant.TransactionType.DEBT, userAccount.getAccountNumber());
             transactionMetaData.setListDebts(transactions.stream().map(transaction -> transactionMapper.transactionToTransactionInfo(transaction)).collect(Collectors.toCollection(LinkedList::new)));
         } else if (accountRequest.getTransactionType().equals(Constant.TransactionType.PAY_IN)) {
-            List<Transaction> transactions = transactionRepository.getListTransactionByTypeToAccount(userAccount.getAccountNumber());
+            List<Transaction> transactions = transactionRepository.getListTransactionByTypeToAccount(Constant.TransactionType.PAY_IN, userAccount.getAccountNumber());
             transactionMetaData.setListPayIn(transactions.stream().map(transaction -> transactionMapper.transactionToTransactionInfo(transaction)).collect(Collectors.toCollection(LinkedList::new)));
         } else if (accountRequest.getTransactionType().equals(Constant.TransactionType.ALL)) {
             List<Transaction> transactionsTransfers = transactionRepository.getListTransactionByTypeFromAccount(Constant.TransactionType.TRANSFER, userAccount.getAccountNumber());
             transactionMetaData.setListTransfers(transactionsTransfers.stream().map(transaction -> transactionMapper.transactionToTransactionInfo(transaction)).collect(Collectors.toCollection(LinkedList::new)));
             List<Transaction> transactionsDebts = transactionRepository.getListTransactionByTypeFromAccount(Constant.TransactionType.DEBT, userAccount.getAccountNumber());
             transactionMetaData.setListDebts(transactionsDebts.stream().map(transaction -> transactionMapper.transactionToTransactionInfo(transaction)).collect(Collectors.toCollection(LinkedList::new)));
-            List<Transaction> transactionsPayIn = transactionRepository.getListTransactionByTypeToAccount(userAccount.getAccountNumber());
+            List<Transaction> transactionsPayIn = transactionRepository.getListTransactionByTypeToAccount(Constant.TransactionType.PAY_IN, userAccount.getAccountNumber());
             transactionMetaData.setListPayIn(transactionsPayIn.stream().map(transaction -> transactionMapper.transactionToTransactionInfo(transaction)).collect(Collectors.toCollection(LinkedList::new)));
         }
 

@@ -353,7 +353,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         transaction.setFromBank(Constant.BANK_NAME);
         transaction.setToBank(Constant.BANK_NAME);
         transaction.setAmount(debtor.getAmount());
-        transaction.setDescription(debtor.getDescription());
+        transaction.setDescription(debtorRequest.getDescription());
         transaction.setType(Constant.TransactionType.DEBT);
         transaction.setStatus(Constant.TransactionStatus.PENDING);
         transaction.setFromAccountNumber(debtorAccountNumber);
@@ -378,6 +378,26 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public DebtorInfo getDebtInfoById(Integer debtId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+
+        UserInfo userInfo = findUserByPhoneNumber(phoneNumber);
+        if (userInfo == null) {
+            throw new EzException("User does not exist");
+        }
+
+        Account account = accountRepository.getUserAccountByType(userInfo.getUserId(), Constant.AccountType.SPEND_ACCOUNT);
+        Debtor debtor = debtorRepository.getDebtorById(debtId);
+
+        if (!debtor.getUserId().equals(userInfo.getUserId()) && !debtor.getDebtorAccountNumber().equals(account.getAccountNumber())) {
+            throw new EzException("Debt not belong to user");
+        }
+
+        return debtorMapper.debtorToDebtorInfo(debtor);
+    }
+
+    @Override
     public UserInfo getUserById(Integer userId) {
         User user = userRepository.getUserById(userId);
 
@@ -393,5 +413,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         List<Notification> notificationList = notificationRepository.getListUserNotification(userId);
 
         return notificationList.stream().map(notification -> notificationMapper.notificationToNotificationInfo(notification)).collect(Collectors.toList());
+    }
+
+    @Override
+    public NotificationInfo updateNotificationStatus(Integer notificationId) {
+        Notification notification = notificationRepository.getNotificationById(notificationId);
+        if (notification == null) {
+            throw new EzException("Notificaiton does not exist");
+        }
+
+        notificationRepository.updateNotificationStatus(Constant.NotificationStatus.READ, notification.getId());
+        NotificationInfo notificationInfo =  notificationMapper.notificationToNotificationInfo(notification);
+        notificationInfo.setStatus(Constant.NotificationStatus.READ);
+        return notificationInfo;
     }
 }

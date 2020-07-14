@@ -29,7 +29,7 @@ public interface DebtorRepository {
     })
     Debtor getDebtorById(int debtorId);
 
-    @Select("SELECT d.*, r.receiver_name FROM debtor d LEFT JOIN receiver r ON r.receiver_account_number = d.debtor_account_number WHERE d.user_id = #{userId}")
+    @Select("SELECT d.*, r.receiver_name FROM debtor d LEFT JOIN receiver r ON r.receiver_account_number = d.debtor_account_number WHERE d.user_id = #{userId} ORDER BY d.created_at DESC")
     @Results(
             id = "DebtorInfo", value = {
             @Result(column = "id", property = "id", id = true),
@@ -44,10 +44,13 @@ public interface DebtorRepository {
     })
     List<Debtor> getListDebtorsByUserId(int userId);
 
-    @Select("SELECT * FROM debtor WHERE debtor_account_number = #{accountNumber}")
+    @Select("SELECT * FROM debtor WHERE debtor_account_number = #{accountNumber} ORDER BY created_at DESC")
     @ResultMap("DebtorObject")
     List<Debtor> getListDebtsByAccountNumber(long accountNumber);
 
     @Update("UPDATE debtor SET description = #{description}, updated_at = #{updatedAt}, status = #{status} WHERE id = #{debtId}")
     void updateDebtorById(int debtId, String description, Date updatedAt, int status);
+
+    @Update("UPDATE debtor SET updated_at = #{updatedAt}, status = #{status} WHERE id = #{debtId}")
+    void updateDebtorStatusById(int debtId, Date updatedAt, int status);
 }

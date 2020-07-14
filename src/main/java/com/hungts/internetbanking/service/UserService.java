@@ -33,7 +33,11 @@ public interface UserService {
 
     TransactionInfo payDebt(DebtorRequest debtorRequest);
 
+    DebtorInfo getDebtInfoById(Integer debtId);
+
     UserInfo getUserById(Integer userId);
 
     List<NotificationInfo> getListUserNotification(Integer userId);
+
+    NotificationInfo updateNotificationStatus(Integer notificationId);
 }

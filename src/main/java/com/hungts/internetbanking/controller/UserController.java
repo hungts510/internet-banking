@@ -3,7 +3,6 @@ package com.hungts.internetbanking.controller;
 import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
-import com.hungts.internetbanking.model.entity.Notification;
 import com.hungts.internetbanking.model.info.*;
 import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.ChangePasswordRequest;
@@ -251,6 +250,18 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.User.GET_DEBT, method = RequestMethod.POST)
+    public ResponseEntity<?> getDebtInfo(@RequestBody DebtorRequest debtorRequest) {
+        if (debtorRequest.getDebtId() == null || debtorRequest.getDebtId() <= 0) {
+            throw new EzException("Missing debt id");
+        }
+
+        DebtorInfo debtorInfo = userService.getDebtInfoById(debtorRequest.getDebtId());
+        ResponseBody responseBody = new ResponseBody(0, "Success", debtorInfo);
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @RequestMapping(value = ContextPath.User.GET_NOTIFICATION, method = RequestMethod.GET)
     public ResponseEntity<?> getNotification() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -264,6 +275,18 @@ public class UserController {
         List<NotificationInfo> notificationInfoList = userService.getListUserNotification(userInfo.getUserId());
 
         ResponseBody responseBody = new ResponseBody(0, "Success", notificationInfoList);
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.User.READ_NOTIFICATION, method = RequestMethod.GET)
+    public ResponseEntity<?> readNotification(@RequestParam(name = "id") Integer notificationId) {
+        if (notificationId == null || notificationId <= 0) {
+            throw new EzException("Missing notification id");
+        }
+
+        NotificationInfo notificationInfo = userService.updateNotificationStatus(notificationId);
+        ResponseBody responseBody = new ResponseBody(0, "Success", notificationInfo);
         return EzResponse.response(responseBody);
     }
 }

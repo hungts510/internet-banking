@@ -14,7 +14,7 @@ public interface NotificationRepository {
     @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Integer.class)
     void saveNotification(Notification notification);
 
-    @Select("SELECT * FROM notification where to_user_id = #{userId} ORDER BY created_at DESC")
+    @Select("SELECT * FROM notification WHERE to_user_id = #{userId} ORDER BY created_at DESC")
     @Results(
             id = "NotificationObject", value = {
             @Result(column = "id", property = "id", id = true),
@@ -27,4 +27,11 @@ public interface NotificationRepository {
             @Result(column = "updated_at", property = "updatedAt")
     })
     List<Notification> getListUserNotification(Integer userId);
+
+    @Select("SELECT * FROM notification WHERE id = #{notificationId}")
+    @ResultMap("NotificationObject")
+    Notification getNotificationById(Integer notificationId);
+
+    @Update("UPDATE notification SET status = #{status} WHERE id = #{notificationId}")
+    void updateNotificationStatus(Integer status, Integer notificationId);
 }

@@ -3,7 +3,6 @@ package com.hungts.internetbanking.repository;
 import com.hungts.internetbanking.model.entity.Transaction;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -39,11 +38,11 @@ public interface TransactionRepository {
     @Update("UPDATE transactions SET status = #{status} WHERE id = #{transactionId}")
     void updateTransactionStatus(int status, int transactionId);
 
-    @Select("SELECT * FROM transactions WHERE type = #{type} AND from_account_number = #{fromAccountNumber} AND type != 2 ORDER BY created_at DESC")
+    @Select("SELECT * FROM transactions WHERE type = #{type} AND from_account_number = #{fromAccountNumber} AND status != 2 ORDER BY created_at DESC")
     @ResultMap("TransactionObject")
     List<Transaction> getListTransactionByTypeFromAccount(int type, long fromAccountNumber);
 
-    @Select("SELECT * FROM transactions WHERE to_account_number = #{toAccountNumber} AND type != 2 ORDER BY created_at DESC")
+    @Select("SELECT * FROM transactions WHERE type = #{type} AND to_account_number = #{toAccountNumber} AND status != 2 ORDER BY created_at DESC")
     @ResultMap("TransactionObject")
-    List<Transaction> getListTransactionByTypeToAccount(long toAccountNumber);
+    List<Transaction> getListTransactionByTypeToAccount(int type, long toAccountNumber);
 }
