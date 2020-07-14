@@ -28,4 +28,15 @@ public class PartnerServiceImpl implements PartnerService {
 
         return partnerMapper.partnerToPartnerInfo(partner);
     }
+
+    @Override
+    public PartnerInfo getPartnerByPartnerName(String bankName) {
+        Partner partner = partnerRepository.getPartnerByPartnerCode(bankName);
+
+        if (partner == null) {
+            throw new EzException("Partner does not exist");
+        }
+
+        return partnerMapper.partnerToPartnerInfo(partner);
+    }
 }

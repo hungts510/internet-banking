@@ -3,7 +3,9 @@ package com.hungts.internetbanking.controller;
 import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
+import com.hungts.internetbanking.model.entity.Partner;
 import com.hungts.internetbanking.model.info.AccountInfo;
+import com.hungts.internetbanking.model.info.PartnerInfo;
 import com.hungts.internetbanking.model.info.TransactionInfo;
 import com.hungts.internetbanking.model.info.TransactionMetaData;
 import com.hungts.internetbanking.model.request.AccountRequest;
@@ -11,11 +13,15 @@ import com.hungts.internetbanking.model.request.TransactionRequest;
 import com.hungts.internetbanking.model.response.EzResponse;
 import com.hungts.internetbanking.model.response.ResponseBody;
 import com.hungts.internetbanking.service.AccountService;
+import com.hungts.internetbanking.service.PartnerService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.ObjectInput;
 
 @CrossOrigin(maxAge = 3600)
 @RestController
@@ -24,6 +30,9 @@ public class AccountController {
     @Autowired
     AccountService accountService;
 
+    @Autowired
+    PartnerService partnerService;
+
     @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_EMPLOYEE')")
     @RequestMapping(value = ContextPath.Account.INFO, method = RequestMethod.POST)
     public ResponseEntity<?> getAccountInfo(@RequestBody AccountRequest accountRequest) {
@@ -31,7 +40,19 @@ public class AccountController {
             throw new EzException("Missing field account number");
         }
 
-        AccountInfo accountInfo = accountService.getAccountInfoByAccountNumber(accountRequest.getAccountNumber());
+        if (ObjectUtils.isEmpty(accountRequest.getAccountBank())) {
+            throw new EzException("Missing account bank");
+        }
+
+        AccountInfo accountInfo = null;
+        if (accountRequest.getAccountBank().equals(Constant.BANK_NAME)) {
+            accountInfo = accountService.getAccountInfoByAccountNumber(accountRequest.getAccountNumber());
+        } else {
+            PartnerInfo partner = partnerService.getPartnerByPartnerName(accountRequest.getAccountBank());
+            if (partner.getPartnerType().equals(Constant.PartnerType.RSA)) {
+
+            }
+        }
         ResponseBody responseBody = new ResponseBody(0, "Success", accountInfo);
         return EzResponse.response(responseBody);
     }
