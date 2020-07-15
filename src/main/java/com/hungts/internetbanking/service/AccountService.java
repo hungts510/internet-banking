@@ -22,4 +22,6 @@ public interface AccountService {
     void captureTransferTransaction(TransactionRequest transactionRequest);
 
     TransactionMetaData getListAccountTransaction(AccountRequest accountRequest);
+
+    AccountInfo getRSAAccountInfo(String bankName, Long accountNumber);
 }

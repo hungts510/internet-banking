@@ -20,6 +20,7 @@ public class ContextPath {
         public static final String GET_DEBT = "/get-debt";
         public static final String GET_NOTIFICATION = "/get-notification";
         public static final String READ_NOTIFICATION = "/read-notification";
+        public static final String READ_ALL = "/read-all";
     }
 
     public static final class Account {

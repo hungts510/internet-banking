@@ -50,7 +50,7 @@ public class AccountController {
         } else {
             PartnerInfo partner = partnerService.getPartnerByPartnerName(accountRequest.getAccountBank());
             if (partner.getPartnerType().equals(Constant.PartnerType.RSA)) {
-
+                accountService.getRSAAccountInfo(partner.getPartnerName(), accountRequest.getAccountNumber());
             }
         }
         ResponseBody responseBody = new ResponseBody(0, "Success", accountInfo);

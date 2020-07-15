@@ -40,4 +40,6 @@ public interface UserService {
     List<NotificationInfo> getListUserNotification(Integer userId);
 
     NotificationInfo updateNotificationStatus(Integer notificationId);
+
+    void readAllNotificationByUserId(Integer userId);
 }

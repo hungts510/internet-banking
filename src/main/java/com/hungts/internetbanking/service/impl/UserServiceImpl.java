@@ -427,4 +427,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         notificationInfo.setStatus(Constant.NotificationStatus.READ);
         return notificationInfo;
     }
+
+    @Override
+    public void readAllNotificationByUserId(Integer userId) {
+        notificationRepository.updateAllUserNotificationStatus(Constant.NotificationStatus.READ, userId);
+    }
 }

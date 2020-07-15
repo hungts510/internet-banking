@@ -34,4 +34,7 @@ public interface NotificationRepository {
 
     @Update("UPDATE notification SET status = #{status} WHERE id = #{notificationId}")
     void updateNotificationStatus(Integer status, Integer notificationId);
+
+    @Update("UPDATE notification SET status = #{status} WHERE to_user_id = #{userId}")
+    void updateAllUserNotificationStatus(Integer status, Integer userId);
 }

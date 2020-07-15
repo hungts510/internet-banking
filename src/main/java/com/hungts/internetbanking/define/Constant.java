@@ -1,5 +1,9 @@
 package com.hungts.internetbanking.define;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 public class Constant {
     public static final String ACCOUNT_NUMBER_PREFIX = "53210000";
     public static final String DEFAULT_PASSWORD = "123456aA@";
@@ -68,6 +72,15 @@ public class Constant {
     public static final class PartnerType {
         public static final String PGP = "PGP";
         public static final String RSA = "RSA";
+    }
+
+    public static final class PartnerName {
+        public static final String BANK25 = "Bank25";
+    }
+
+    public static final class PartnerAPI {
+       public static final String BANK_25_ACCOUNT_INFO = "https://bank25.herokuapp.com/api/partner/account-bank/destination-account";
+       public static final String BANK_25_RECHARGE_ACCOUNT = "https://bank25.herokuapp.com/api/partner/account-bank/destination-account/recharge";
     }
 
     public static final String SOURCE_PASS_PHRASE = "12345";

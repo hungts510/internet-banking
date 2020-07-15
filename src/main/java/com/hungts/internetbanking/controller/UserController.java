@@ -289,4 +289,17 @@ public class UserController {
         ResponseBody responseBody = new ResponseBody(0, "Success", notificationInfo);
         return EzResponse.response(responseBody);
     }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.User.READ_ALL, method = RequestMethod.GET)
+    public ResponseEntity<?> readAllNotification() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+
+        UserInfo userInfo = userService.findUserByPhoneNumber(phoneNumber);
+
+        userService.readAllNotificationByUserId(userInfo.getUserId());
+        ResponseBody responseBody = new ResponseBody(0, "Success");
+        return EzResponse.response(responseBody);
+    }
 }

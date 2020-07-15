@@ -1,5 +1,6 @@
 package com.hungts.internetbanking.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.mapper.TransactionMapper;
@@ -20,16 +21,25 @@ import com.hungts.internetbanking.service.AccountService;
 import com.hungts.internetbanking.service.UserService;
 import com.hungts.internetbanking.util.EmailUtil;
 import com.hungts.internetbanking.util.Utils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import zipkin2.Call;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.security.PrivateKey;
+import java.security.Signature;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -290,5 +300,42 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return transactionMetaData;
+    }
+
+    @Override
+    public AccountInfo getRSAAccountInfo(String bankName, Long accountNumber) {
+        AccountInfo accountInfo = null;
+
+        if (bankName.equals(Constant.PartnerName.BANK25)) {
+            try {
+                Map<String, Object> requestInfo = new HashMap<>();
+                requestInfo.put("BankName", "30Bank");
+                requestInfo.put("DestinationAccountNumber", accountNumber);
+                requestInfo.put("iat", System.currentTimeMillis());
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                String requestInfoString = objectMapper.writeValueAsString(requestInfo);
+
+                Map<String, Object> mapRequest = new HashMap<>();
+                mapRequest.put("Encrypted", Base64.getEncoder().encodeToString(requestInfoString.getBytes()));
+
+                Signature privateSignature = Signature.getInstance("SHA256withRSA");
+//                privateSignature.initSign();
+                privateSignature.update(requestInfoString.getBytes(UTF_8));
+                byte[] signature = privateSignature.sign();
+                mapRequest.put("Signed", Base64.getEncoder().encodeToString(signature));
+
+                CloseableHttpClient httpClient = HttpClients.createDefault();
+                HttpPost httpPost = new HttpPost(Constant.PartnerAPI.BANK_25_ACCOUNT_INFO);
+                StringEntity entity = new StringEntity(objectMapper.writeValueAsString(mapRequest));
+                httpPost.setEntity(entity);
+
+                CloseableHttpResponse response = httpClient.execute(httpPost);
+
+            } catch (Exception e) {
+                throw new EzException("Can't get account info. Error: " + e.getMessage());
+            }
+        }
+        return null;
     }
 }
