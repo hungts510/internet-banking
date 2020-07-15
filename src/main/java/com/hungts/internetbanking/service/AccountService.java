@@ -24,4 +24,6 @@ public interface AccountService {
     TransactionMetaData getListAccountTransaction(AccountRequest accountRequest);
 
     AccountInfo getRSAAccountInfo(String bankName, Long accountNumber);
+
+    AccountInfo getPGPAccountInfo(String bankName, Long accountNumber);
 }

@@ -20,6 +20,7 @@ import com.hungts.internetbanking.repository.TransactionRepository;
 import com.hungts.internetbanking.service.AccountService;
 import com.hungts.internetbanking.service.UserService;
 import com.hungts.internetbanking.util.EmailUtil;
+import com.hungts.internetbanking.util.PGPSecurity;
 import com.hungts.internetbanking.util.Utils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
@@ -336,6 +337,50 @@ public class AccountServiceImpl implements AccountService {
                 throw new EzException("Can't get account info. Error: " + e.getMessage());
             }
         }
-        return null;
+        return accountInfo;
+    }
+
+    @Override
+    public AccountInfo getPGPAccountInfo(String bankName, Long accountNumber) {
+        AccountInfo accountInfo = null;
+
+        if (bankName.equals(Constant.PartnerName.PGP30BANK)) {
+            try {
+                Map<String, Object> requestInfo = new HashMap<>();
+                requestInfo.put("account_number", accountNumber);
+                requestInfo.put("request_time", System.currentTimeMillis());
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                String requestInfoString = objectMapper.writeValueAsString(requestInfo);
+
+                PGPSecurity pgpSecurity = new PGPSecurity();
+                String encryptMessage = null;
+
+                try {
+                    encryptMessage = pgpSecurity.encryptAndSign(requestInfoString,
+                            Constant.SOURCE_USER_EMAIL,
+                            Constant.SOURCE_PASS_PHRASE,
+                            PGPSecurity.ArmoredKeyPair.of(Constant.SOURCE_PRIVATE_KEYS, Constant.SOURCE_PUBLIC_KEYS),
+                            Constant.DEST_USER_EMAIL,
+                            Constant.DEST_PUBLIC_KEYS);
+
+                    System.out.printf(encryptMessage);
+                } catch (Exception e) {
+                    throw new EzException("Message invalid: " + e.getMessage());
+                }
+
+                CloseableHttpClient httpClient = HttpClients.createDefault();
+                HttpPost httpPost = new HttpPost(Constant.PartnerAPI.BANK_30_SUB_ACCOUNT_INFO);
+                StringEntity entity = new StringEntity(encryptMessage);
+                httpPost.setEntity(entity);
+                httpPost.setHeader("partner-code", Constant.BANK_NAME);
+
+                CloseableHttpResponse response = httpClient.execute(httpPost);
+                System.out.println(response);
+            } catch (Exception e) {
+                throw new EzException("Can't get account info. Error: " + e.getMessage());
+            }
+        }
+        return accountInfo;
     }
 }

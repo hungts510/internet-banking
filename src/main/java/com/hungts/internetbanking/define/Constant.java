@@ -76,11 +76,14 @@ public class Constant {
 
     public static final class PartnerName {
         public static final String BANK25 = "Bank25";
+        public static final String PGP30BANK = "PGP30Bank";
     }
 
     public static final class PartnerAPI {
        public static final String BANK_25_ACCOUNT_INFO = "https://bank25.herokuapp.com/api/partner/account-bank/destination-account";
        public static final String BANK_25_RECHARGE_ACCOUNT = "https://bank25.herokuapp.com/api/partner/account-bank/destination-account/recharge";
+       public static final String BANK_30_SUB_ACCOUNT_INFO = "localhost:9808/api/account/info";
+       public static final String BANK_30_SUB_RECHARGE_ACCOUNT = "localhost:9808/api/account/recharge";
     }
 
     public static final String SOURCE_PASS_PHRASE = "12345";
