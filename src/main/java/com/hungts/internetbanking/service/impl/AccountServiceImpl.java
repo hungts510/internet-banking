@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import zipkin2.Call;
 
 import javax.crypto.Cipher;
+import java.io.ByteArrayOutputStream;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -312,23 +313,23 @@ public class AccountServiceImpl implements AccountService {
         if (bankName.equals(Constant.PartnerName.BANK25)) {
             try {
                 Map<String, Object> requestInfo = new HashMap<>();
-//                requestInfo.put("BankName", "30Bank");
-//                requestInfo.put("DestinationAccountNumber", accountNumber);
-//                requestInfo.put("iat", System.currentTimeMillis());
-
                 requestInfo.put("BankName", "30Bank");
-                requestInfo.put("SourceAccountNumber", "102102102");
-                requestInfo.put("SourceAccountName", "Nguyễn Thanh Nam");
                 requestInfo.put("DestinationAccountNumber", accountNumber);
-                requestInfo.put("Amount", 50000);
-                requestInfo.put("Message", "30Bank test recharge API");
                 requestInfo.put("iat", System.currentTimeMillis());
+
+//                requestInfo.put("BankName", "30Bank");
+//                requestInfo.put("SourceAccountNumber", "102102102");
+//                requestInfo.put("SourceAccountName", "Nguyễn Thanh Nam");
+//                requestInfo.put("DestinationAccountNumber", accountNumber);
+//                requestInfo.put("Amount", 50000);
+//                requestInfo.put("Message", "30Bank test recharge API");
+//                requestInfo.put("iat", System.currentTimeMillis());
 
                 ObjectMapper objectMapper = new ObjectMapper();
                 String requestInfoString = objectMapper.writeValueAsString(requestInfo);
                 Map<String, Object> mapRequest = new HashMap<>();
 
-                String publicKeyContent = Constant.KEY_2048.replaceAll("\n", "").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
+                String publicKeyContent = Constant.BANK25_RSA_PUBLIC_KEY.replaceAll("\n", "").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
                 X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyContent));
                 KeyFactory kf = KeyFactory.getInstance("RSA");
                 PublicKey publicKey =  kf.generatePublic(keySpecX509);
@@ -336,6 +337,19 @@ public class AccountServiceImpl implements AccountService {
                 Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
 //                Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
                 cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//                int limit = 1024/8 -11;
+//                int position = 0;
+//
+//                while (position < requestInfoString.length()) {
+//                    if (requestInfoString.length() - position < limit) {
+//                        limit = requestInfoString.length() - position;
+//                    }
+//                    byte[] data = cipher.doFinal(requestInfoString.getBytes(), position, limit);
+//                    byteArrayOutputStream.write(data);
+//                    position += limit;
+//                }
+
                 byte[] encryptData = cipher.doFinal(requestInfoString.getBytes());
                 String encryptMessage = Base64.getEncoder().encodeToString(encryptData);
                 mapRequest.put("Encrypted", encryptMessage);
