@@ -47,9 +47,12 @@ public class TransactionInfo {
     @JsonDeserialize(using = CustomDateDeSerializer.class)
     private Date updatedAt;
 
-    @JsonProperty("fromBank")
+    @JsonProperty("from_bank")
     private String fromBank;
 
-    @JsonProperty("toBank")
+    @JsonProperty("to_bank")
     private String toBank;
+
+    @JsonProperty("is_pay_fee")
+    private boolean isUserPayFee;
 }

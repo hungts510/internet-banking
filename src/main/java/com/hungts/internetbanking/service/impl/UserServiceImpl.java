@@ -369,7 +369,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         try {
-            EmailUtil.sendTransferOTP(userInfo, transaction.getAmount(), transaction.getOtp());
+            EmailUtil.sendTransferOTP(userInfo, transaction);
         } catch (Exception e) {
             throw new EzException("Fail to send email");
         }

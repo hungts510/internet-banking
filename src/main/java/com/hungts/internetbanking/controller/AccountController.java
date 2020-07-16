@@ -4,10 +4,7 @@ import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.model.entity.Partner;
-import com.hungts.internetbanking.model.info.AccountInfo;
-import com.hungts.internetbanking.model.info.PartnerInfo;
-import com.hungts.internetbanking.model.info.TransactionInfo;
-import com.hungts.internetbanking.model.info.TransactionMetaData;
+import com.hungts.internetbanking.model.info.*;
 import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.TransactionRequest;
 import com.hungts.internetbanking.model.response.EzResponse;
@@ -21,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.ws.Response;
 import java.io.ObjectInput;
 
 @CrossOrigin(maxAge = 3600)
@@ -45,17 +43,18 @@ public class AccountController {
         }
 
         AccountInfo accountInfo = null;
+        ResponseExternalAccountInfo responseExternalAccountInfo = null;
         if (accountRequest.getAccountBank().equals(Constant.BANK_NAME)) {
             accountInfo = accountService.getAccountInfoByAccountNumber(accountRequest.getAccountNumber());
         } else {
             PartnerInfo partner = partnerService.getPartnerByPartnerName(accountRequest.getAccountBank());
             if (partner.getPartnerType().equals(Constant.PartnerType.RSA)) {
-                accountService.getRSAAccountInfo(partner.getPartnerName(), accountRequest.getAccountNumber());
+                responseExternalAccountInfo = accountService.getRSAAccountInfo(partner.getPartnerName(), accountRequest.getAccountNumber());
             } else {
-                accountService.getPGPAccountInfo(partner.getPartnerName(), accountRequest.getAccountNumber());
+                responseExternalAccountInfo = accountService.getPGPAccountInfo(partner.getPartnerName(), accountRequest.getAccountNumber());
             }
         }
-        ResponseBody responseBody = new ResponseBody(0, "Success", accountInfo);
+        ResponseBody responseBody = new ResponseBody(0, "Success", accountInfo == null ? responseExternalAccountInfo : accountInfo);
         return EzResponse.response(responseBody);
     }
 
@@ -88,12 +87,6 @@ public class AccountController {
 
         if (transactionRequest.getAmount() == null || transactionRequest.getAmount() <= 0) {
             throw new EzException("Missing transaction amount");
-        }
-
-        if (StringUtils.isBlank(transactionRequest.getFromBank()) || StringUtils.isBlank(transactionRequest.getToBank())
-                || !transactionRequest.getFromBank().equals(transactionRequest.getToBank()) || !transactionRequest.getFromBank().equals(Constant.BANK_NAME)
-                || !transactionRequest.getToBank().equals(Constant.BANK_NAME)) {
-            throw new EzException("API just for internal transfer purpose");
         }
 
         TransactionInfo transactionInfo = accountService.createTransferMoneyTransaction(transactionRequest);

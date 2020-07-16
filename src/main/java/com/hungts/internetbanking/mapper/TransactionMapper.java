@@ -24,6 +24,7 @@ public interface TransactionMapper {
             @Mapping(target = "updatedAt", source = "updatedAt"),
             @Mapping(target = "fromBank", source = "fromBank"),
             @Mapping(target = "toBank", source = "toBank"),
+            @Mapping(target = "userPayFee", source = "payFee"),
     })
     TransactionInfo transactionToTransactionInfo(Transaction transaction);
 }

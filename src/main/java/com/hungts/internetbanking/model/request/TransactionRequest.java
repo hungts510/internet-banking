@@ -39,4 +39,7 @@ public class TransactionRequest {
 
     @JsonProperty("otp")
     private String otp;
+
+    @JsonProperty("is_pay_fee")
+    private boolean isUserPayFee;
 }

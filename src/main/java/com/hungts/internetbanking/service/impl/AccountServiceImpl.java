@@ -7,10 +7,7 @@ import com.hungts.internetbanking.mapper.TransactionMapper;
 import com.hungts.internetbanking.model.entity.Account;
 import com.hungts.internetbanking.model.entity.Notification;
 import com.hungts.internetbanking.model.entity.Transaction;
-import com.hungts.internetbanking.model.info.AccountInfo;
-import com.hungts.internetbanking.model.info.TransactionInfo;
-import com.hungts.internetbanking.model.info.TransactionMetaData;
-import com.hungts.internetbanking.model.info.UserInfo;
+import com.hungts.internetbanking.model.info.*;
 import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.TransactionRequest;
 import com.hungts.internetbanking.repository.AccountRepository;
@@ -29,14 +26,17 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import zipkin2.Call;
 
-import java.security.PrivateKey;
-import java.security.Signature;
+import javax.crypto.Cipher;
+import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -166,29 +166,25 @@ public class AccountServiceImpl implements AccountService {
             throw new EzException("Source account does not exist");
         }
 
-        Account destinationAccount = accountRepository.getAccountFullInfoByAccountNumber(transactionRequest.getToAccountNumber());
-        if (destinationAccount == null) {
-            throw new EzException("Destination account does not exist");
-        }
-
         if (userSourceAccount.getBalance() < transactionRequest.getAmount()) {
             throw new EzException("Balance not enough");
         }
 
         Transaction transaction = new Transaction();
         transaction.setFromUserId(userInfo.getUserId());
-        transaction.setToUserId(destinationAccount.getUserId());
+        transaction.setToUserId(transactionRequest.getToUserId());
         transaction.setFromBank(Constant.BANK_NAME);
-        transaction.setToBank(Constant.BANK_NAME);
+        transaction.setToBank(transactionRequest.getToBank());
         transaction.setAmount(transactionRequest.getAmount());
         transaction.setDescription(transactionRequest.getDescription());
         transaction.setType(Constant.TransactionType.TRANSFER);
         transaction.setStatus(Constant.TransactionStatus.PENDING);
         transaction.setFromAccountNumber(userSourceAccount.getAccountNumber());
-        transaction.setToAccountNumber(destinationAccount.getAccountNumber());
+        transaction.setToAccountNumber(transactionRequest.getToAccountNumber());
         transaction.setOtp(Utils.randomOTP());
         transaction.setCreatedAt(new Date());
         transaction.setUpdatedAt(new Date());
+        transaction.setPayFee(transactionRequest.isUserPayFee());
 
         transactionRepository.saveTransaction(transaction);
         if (transaction.getId() == null) {
@@ -196,7 +192,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         try {
-            EmailUtil.sendTransferOTP(userInfo, transaction.getAmount(), transaction.getOtp());
+            EmailUtil.sendTransferOTP(userInfo, transaction);
         } catch (Exception e) {
             throw new EzException("Fail to send email");
         }
@@ -240,7 +236,13 @@ public class AccountServiceImpl implements AccountService {
             throw new EzException("Balance not enough");
         }
 
-        Account destinationAccount = accountRepository.getAccountFullInfoByAccountNumber(transaction.getToAccountNumber());
+        Account destinationAccount = null;
+        if (transaction.getFromBank().equals(transaction.getToBank())) {
+            //Transfer internal
+            destinationAccount = accountRepository.getAccountFullInfoByAccountNumber(transaction.getToAccountNumber());
+        } else {
+
+        }
 
         long newSourceBalance = userSourceAccount.getBalance() - transaction.getAmount();
         long newDestinationBalance = destinationAccount.getBalance() + transaction.getAmount();
@@ -304,34 +306,66 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountInfo getRSAAccountInfo(String bankName, Long accountNumber) {
-        AccountInfo accountInfo = null;
+    public ResponseExternalAccountInfo getRSAAccountInfo(String bankName, Long accountNumber) {
+        ResponseExternalAccountInfo accountInfo = null;
 
         if (bankName.equals(Constant.PartnerName.BANK25)) {
             try {
                 Map<String, Object> requestInfo = new HashMap<>();
+//                requestInfo.put("BankName", "30Bank");
+//                requestInfo.put("DestinationAccountNumber", accountNumber);
+//                requestInfo.put("iat", System.currentTimeMillis());
+
                 requestInfo.put("BankName", "30Bank");
+                requestInfo.put("SourceAccountNumber", "102102102");
+                requestInfo.put("SourceAccountName", "Nguyễn Thanh Nam");
                 requestInfo.put("DestinationAccountNumber", accountNumber);
+                requestInfo.put("Amount", 50000);
+                requestInfo.put("Message", "30Bank test recharge API");
                 requestInfo.put("iat", System.currentTimeMillis());
 
                 ObjectMapper objectMapper = new ObjectMapper();
                 String requestInfoString = objectMapper.writeValueAsString(requestInfo);
-
                 Map<String, Object> mapRequest = new HashMap<>();
-                mapRequest.put("Encrypted", Base64.getEncoder().encodeToString(requestInfoString.getBytes()));
+
+                String publicKeyContent = Constant.KEY_2048.replaceAll("\n", "").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
+                X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyContent));
+                KeyFactory kf = KeyFactory.getInstance("RSA");
+                PublicKey publicKey =  kf.generatePublic(keySpecX509);
+
+                Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
+//                Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+                cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+                byte[] encryptData = cipher.doFinal(requestInfoString.getBytes());
+                String encryptMessage = Base64.getEncoder().encodeToString(encryptData);
+                mapRequest.put("Encrypted", encryptMessage);
 
                 Signature privateSignature = Signature.getInstance("SHA256withRSA");
-//                privateSignature.initSign();
+
+                String privateKeyContent = Constant.RSA_PRIVATE_KEY.replaceAll("\n", "").replace("-----BEGIN RSA PRIVATE KEY-----", "").replace("-----END RSA PRIVATE KEY-----", "");
+                PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyContent));
+                PrivateKey privateKey = kf.generatePrivate(keySpecPKCS8);;
+                privateSignature.initSign(privateKey);
                 privateSignature.update(requestInfoString.getBytes(UTF_8));
                 byte[] signature = privateSignature.sign();
-                mapRequest.put("Signed", Base64.getEncoder().encodeToString(signature));
+                String signatureString = Base64.getEncoder().encodeToString(signature);
+                mapRequest.put("Signed", signatureString);
 
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 HttpPost httpPost = new HttpPost(Constant.PartnerAPI.BANK_25_ACCOUNT_INFO);
                 StringEntity entity = new StringEntity(objectMapper.writeValueAsString(mapRequest));
                 httpPost.setEntity(entity);
+                httpPost.setHeader("Accept", "application/json");
+                httpPost.setHeader("Content-Type", "application/json");
 
                 CloseableHttpResponse response = httpClient.execute(httpPost);
+                String body = EntityUtils.toString(response.getEntity(), "UTF-8");
+                Map<String, Object> mapResponse = objectMapper.readValue(body, Map.class);
+                if ((int) mapResponse.get("code") != 0) {
+                    throw new EzException("Get account info failed, response: " + mapResponse.get("message"));
+                }
+
+                accountInfo = objectMapper.convertValue(mapResponse.get("data"), ResponseExternalAccountInfo.class);
 
             } catch (Exception e) {
                 throw new EzException("Can't get account info. Error: " + e.getMessage());
@@ -341,8 +375,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountInfo getPGPAccountInfo(String bankName, Long accountNumber) {
-        AccountInfo accountInfo = null;
+    public ResponseExternalAccountInfo getPGPAccountInfo(String bankName, Long accountNumber) {
+        ResponseExternalAccountInfo accountInfo = null;
 
         if (bankName.equals(Constant.PartnerName.PGP30BANK)) {
             try {
@@ -369,13 +403,26 @@ public class AccountServiceImpl implements AccountService {
                     throw new EzException("Message invalid: " + e.getMessage());
                 }
 
+
+                Map<String, Object> mapRequest = new HashMap<>();
+                mapRequest.put("message", encryptMessage);
+
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 HttpPost httpPost = new HttpPost(Constant.PartnerAPI.BANK_30_SUB_ACCOUNT_INFO);
-                StringEntity entity = new StringEntity(encryptMessage);
+                StringEntity entity = new StringEntity(objectMapper.writeValueAsString(mapRequest));
                 httpPost.setEntity(entity);
                 httpPost.setHeader("partner-code", Constant.BANK_NAME);
+                httpPost.setHeader("Accept", "application/json");
+                httpPost.setHeader("Content-Type", "application/json");
 
                 CloseableHttpResponse response = httpClient.execute(httpPost);
+                String body = EntityUtils.toString(response.getEntity(), "UTF-8");
+                Map<String, Object> mapResponse = objectMapper.readValue(body, Map.class);
+                if ((int) mapResponse.get("code") != 0) {
+                    throw new EzException("Get account info failed, response: " + mapResponse.get("message"));
+                }
+
+                accountInfo = objectMapper.convertValue(mapResponse.get("data"), ResponseExternalAccountInfo.class);
                 System.out.println(response);
             } catch (Exception e) {
                 throw new EzException("Can't get account info. Error: " + e.getMessage());

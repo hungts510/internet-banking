@@ -82,7 +82,7 @@ public class Constant {
     public static final class PartnerAPI {
        public static final String BANK_25_ACCOUNT_INFO = "https://bank25.herokuapp.com/api/partner/account-bank/destination-account";
        public static final String BANK_25_RECHARGE_ACCOUNT = "https://bank25.herokuapp.com/api/partner/account-bank/destination-account/recharge";
-       public static final String BANK_30_SUB_ACCOUNT_INFO = "localhost:9808/api/account/info";
+       public static final String BANK_30_SUB_ACCOUNT_INFO = "http://localhost:9808/api/account/info";
        public static final String BANK_30_SUB_RECHARGE_ACCOUNT = "localhost:9808/api/account/recharge";
     }
 
@@ -90,6 +90,46 @@ public class Constant {
     public static final String DEST_PASS_PHRASE = "123456";
     public static final String SOURCE_USER_EMAIL = "hungts@test.com";
     public static final String DEST_USER_EMAIL = "hungtsdest@test.com";
+
+    public static final String RSA_PRIVATE_KEY = "-----BEGIN RSA PRIVATE KEY-----\n" +
+            "MIICWwIBAAKBgH57DXoeMjfd7034CmiG1KVVhSjNdLZePOsnQhSM0SrREgPboaff\n" +
+            "QaEhSKHrsRYrtCiA2UNCs9SDSQAo9pOXKWuEdJTZrCN6OTKoo0I5Qhmf6ItB4XU2\n" +
+            "RYm0h9LoIdGs77Nzsly0rwI2dSElt/9RCd2ns1XrSEaDGAIIafSpshB7AgMBAAEC\n" +
+            "gYAZ9w0HOte4XFlaOkd4ueVBo9LYU4VYQvRimgaYzWfLUGxQWnBPVCfW+kw84XPT\n" +
+            "R1mOzxTLGBBu2hzMaZxlJC0eWRu6UdvChg6VPUc93ufE5ggUee034FPWBPCrxBph\n" +
+            "3f7XniNkp8uKGsPkgQ3UJqVR5tg6+liXEyubFPiKop66sQJBAMiSGltouc5k+WAV\n" +
+            "xizebmgXJ94jPEvS8v2Qh0oXjClYGmCkCUsCl2uzTXuarI0j0lai8pgG005sCs4A\n" +
+            "NgLjzvcCQQChb0HMWhYuQzUP1zbmCUCgy3EgqCdhfbHB6bIzVFQLSPHDbKaKqfvH\n" +
+            "LhIiP+5T1b75V+XYTmZitMB0h/fnNTWdAkEAqgiqTYn30xBpFNsAuXMMODRBOSG3\n" +
+            "8TPxiaLn/pj92uL04a7OrgeRZN2Jt1rGI5UVsRrM/LL0mkwf0Mn+/+4uuwJAJmFK\n" +
+            "Fmhwj40g52Q2RBh9Cf10JtxziGUWxtBlsnhhBtHP0LNbIOpq1p7oZsYmRj4yChvQ\n" +
+            "pE13YA4zF0FgOdLXrQJAJxMW3m4gBbOVJUzAjx5pd58sWxxH7vyZlUdBBBdMK45X\n" +
+            "HiIC4iiEvfiqiaTZTmImlYaVLbsF8cKKztMblfX6eQ==\n" +
+            "-----END RSA PRIVATE KEY-----";
+
+    public static final String RSA_PUBLIC_KEY = "-----BEGIN PUBLIC KEY-----\n" +
+            "MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgH57DXoeMjfd7034CmiG1KVVhSjN\n" +
+            "dLZePOsnQhSM0SrREgPboaffQaEhSKHrsRYrtCiA2UNCs9SDSQAo9pOXKWuEdJTZ\n" +
+            "rCN6OTKoo0I5Qhmf6ItB4XU2RYm0h9LoIdGs77Nzsly0rwI2dSElt/9RCd2ns1Xr\n" +
+            "SEaDGAIIafSpshB7AgMBAAE=\n" +
+            "-----END PUBLIC KEY-----";
+
+    public static final String BANK25_RSA_PUBLIC_KEY = "-----BEGIN PUBLIC KEY-----\n" +
+            "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCTJstKm8Uzb5fsi2dneTG4fPsR\n" +
+            "WTxX4fsL7sHq9w0SilwSSS7AM4TZrK0/HhwzuXGotVPwxln9JRflZHnx8tzt1zwE\n" +
+            "prBAuXaTnZwD15JHrF17jS2C0mze2j9olErB7oJa+OJ6hRYIB/kB4NaOTcl1f9n1\n" +
+            "C0yM2o2SIGlTWWRd5QIDAQAB\n" +
+            "-----END PUBLIC KEY-----";
+
+    public static final String KEY_2048 = "-----BEGIN PUBLIC KEY-----\n" +
+            "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1W+XhtSaU1tezsRVwScB\n" +
+            "TuhkDMakYauhwNzvfeo2MSHkwsK/x2qezSm/T5OwWoWtobxAQQ6zEX08xfP4myVt\n" +
+            "xzNtBR5yS4dGeM4JpoMeIUAHiBFBoKR/qKBYyXJMPd4Pnu1+yevz3OKW10ajL8vu\n" +
+            "qJmmz6/o5RQWv1htuxRJtGpsBjQ9Ow4O8tYoT0R6imkTG8MD6HtyMSyY0OBISlW0\n" +
+            "tSS8JYRlBjOjAbflz23Mcoh3NyuSfJfxHzp6qnHI+b3jCzzH5VXTVCOPdjJUBe6/\n" +
+            "yIcn5O/r5Rztp/UEgb2xOBgATi2y/sSUJiATl2UfW+Wg5SuA8OoT0bFdPkHokXf3\n" +
+            "2QIDAQAB\n" +
+            "-----END PUBLIC KEY-----";
 
     public static final String SOURCE_PUBLIC_KEYS = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +
             "Version: Keybase OpenPGP v1.0.0\n" +

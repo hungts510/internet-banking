@@ -37,4 +37,6 @@ public class Transaction {
     private String otp;
 
     private Integer debtId;
+
+    private boolean isPayFee;
 }

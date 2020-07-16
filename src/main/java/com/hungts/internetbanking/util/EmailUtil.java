@@ -2,6 +2,7 @@ package com.hungts.internetbanking.util;
 
 import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.exception.EzException;
+import com.hungts.internetbanking.model.entity.Transaction;
 import com.hungts.internetbanking.model.info.UserInfo;
 
 import javax.mail.*;
@@ -58,11 +59,12 @@ public class EmailUtil {
         }
     }
 
-    public static void sendTransferOTP(UserInfo userInfo, long amount, String otp) {
+    public static void sendTransferOTP(UserInfo userInfo, Transaction transaction) {
         String message = "Xin chào, " + userInfo.getFullName() + ".<br>";
-        message += "<b>Bạn đang thực hiện một giao dịch chuyển tiền. Tài khoản của bạn sẽ bị trừ: " + amount + "đ. </b><br>";
+        message += "<b>Bạn đang thực hiện một giao dịch chuyển tiền đến tài khoản " + transaction.getToAccountNumber() + ". Ngân hàng: " + transaction.getToBank() + "</b><br>";
+        message += "<b>Tài khoản của bạn sẽ bị trừ: " + transaction.getAmount() + "đ. </b><br>";
         message += "<b>Mã OTP sử dụng để xác nhận giao dịch của bạn là: </b><br>";
-        message += "<h2>" + otp + "</h2>";
+        message += "<h2>" + transaction.getOtp() + "</h2>";
         message += "Mã OTP có hiệu lực trong vòng 5 phút.<br>";
         message += "Để đảm bảo an toàn. Vui lòng không chia sẻ mã này cho người khác!";
 
