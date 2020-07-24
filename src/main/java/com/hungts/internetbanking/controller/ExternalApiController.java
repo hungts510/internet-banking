@@ -50,48 +50,48 @@ public class ExternalApiController {
 
         AccountInfo accountInfo = null;
 
-        if (partnerInfo.getPartnerType().equals(Constant.PartnerType.PGP)) {
-            PGPSecurity pgpSecurity = new PGPSecurity();
-            String decryptedMessage = null;
 
-            try {
+        PGPSecurity pgpSecurity = new PGPSecurity();
+        String decryptedMessage = null;
 
-                decryptedMessage = pgpSecurity.decryptAndVerify(externalRequest.getMessage(),
-                        Constant.DEST_PASS_PHRASE,
-                        PGPSecurity.ArmoredKeyPair.of(Constant.DEST_PRIVATE_KEYS, Constant.DEST_PUBLIC_KEYS),
-                        Constant.BANK25_USER_EMAIL,
-                        Constant.BANK25_PGP_PUBLIC_KEY);
+        try {
 
-                System.out.printf(decryptedMessage);
-            } catch (Exception e) {
-                throw new EzException("Message invalid: " + e.getMessage());
-            }
+            decryptedMessage = pgpSecurity.decryptAndVerify(externalRequest.getMessage(),
+                    Constant.DEST_PASS_PHRASE,
+                    PGPSecurity.ArmoredKeyPair.of(Constant.DEST_PRIVATE_KEYS, Constant.DEST_PUBLIC_KEYS),
+                    Constant.BANK25_USER_EMAIL,
+                    Constant.BANK25_PGP_PUBLIC_KEY);
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-            ExternalRequest requestMessage = null;
-            try {
-                requestMessage = objectMapper.readValue(decryptedMessage, ExternalRequest.class);
-            } catch (Exception e) {
-                throw new EzException("Can't parse JSON message");
-            }
-
-            if (requestMessage.getRequestTime() == null || requestMessage.getRequestTime() == 0
-                    || System.currentTimeMillis() - requestMessage.getRequestTime() > Constant.OTP_AVAILABLE_TIME) {
-                throw new EzException("Request expired (5 minutes)");
-            }
-
-            if (requestMessage.getAccountNumber() == null || requestMessage.getAccountNumber() < 0) {
-                throw new EzException("Missing account number");
-            }
-
-            accountInfo = accountService.getAccountInfoByAccountNumber(requestMessage.getAccountNumber());
-
-            if (accountInfo == null) {
-                throw new EzException("Account does not exist");
-            }
+            System.out.printf(decryptedMessage);
+        } catch (Exception e) {
+            throw new EzException("Message invalid: " + e.getMessage());
         }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        ExternalRequest requestMessage = null;
+        try {
+            requestMessage = objectMapper.readValue(decryptedMessage, ExternalRequest.class);
+        } catch (Exception e) {
+            throw new EzException("Can't parse JSON message");
+        }
+
+        if (requestMessage.getRequestTime() == null || requestMessage.getRequestTime() == 0
+                || System.currentTimeMillis() - requestMessage.getRequestTime() > Constant.OTP_AVAILABLE_TIME) {
+            throw new EzException("Request expired (5 minutes)");
+        }
+
+        if (requestMessage.getAccountNumber() == null || requestMessage.getAccountNumber() < 0) {
+            throw new EzException("Missing account number");
+        }
+
+        accountInfo = accountService.getAccountInfoByAccountNumber(requestMessage.getAccountNumber());
+
+        if (accountInfo == null) {
+            throw new EzException("Account does not exist");
+        }
+
         //Get public key of partner
         //Verify request
         //Check request expired
