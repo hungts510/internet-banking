@@ -313,17 +313,17 @@ public class AccountServiceImpl implements AccountService {
         if (bankName.equals(Constant.PartnerName.BANK25)) {
             try {
                 Map<String, Object> requestInfo = new HashMap<>();
-                requestInfo.put("BankName", "30Bank");
-                requestInfo.put("DestinationAccountNumber", accountNumber);
-                requestInfo.put("iat", System.currentTimeMillis());
-
 //                requestInfo.put("BankName", "30Bank");
-//                requestInfo.put("SourceAccountNumber", "102102102");
-//                requestInfo.put("SourceAccountName", "Nguyễn Thanh Nam");
 //                requestInfo.put("DestinationAccountNumber", accountNumber);
-//                requestInfo.put("Amount", 50000);
-//                requestInfo.put("Message", "30Bank test recharge API");
 //                requestInfo.put("iat", System.currentTimeMillis());
+
+                requestInfo.put("BankName", "30Bank");
+                requestInfo.put("SourceAccountNumber", "102102102");
+                requestInfo.put("SourceAccountName", "Nguyễn Thanh Nam");
+                requestInfo.put("DestinationAccountNumber", accountNumber);
+                requestInfo.put("Amount", 50000);
+                requestInfo.put("Message", "30Bank test recharge API");
+                requestInfo.put("iat", System.currentTimeMillis());
 
                 ObjectMapper objectMapper = new ObjectMapper();
                 String requestInfoString = objectMapper.writeValueAsString(requestInfo);

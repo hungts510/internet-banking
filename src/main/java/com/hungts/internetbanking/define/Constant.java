@@ -90,6 +90,7 @@ public class Constant {
     public static final String DEST_PASS_PHRASE = "123456";
     public static final String SOURCE_USER_EMAIL = "hungts@test.com";
     public static final String DEST_USER_EMAIL = "hungtsdest@test.com";
+    public static final String BANK25_USER_EMAIL = "25bank@25bank.com";
 
     public static final String RSA_PRIVATE_KEY = "-----BEGIN RSA PRIVATE KEY-----\n" +
             "MIIEowIBAAKCAQEAk1AOEwhvRWXC+um7CibbbwMLlCn8IwR4O5yF9LFTGYFiYTEd\n" +
@@ -139,15 +140,39 @@ public class Constant {
             "HwIDAQAB\n" +
             "-----END PUBLIC KEY-----";
 
-    public static final String KEY_2048 = "-----BEGIN PUBLIC KEY-----\n" +
-            "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1W+XhtSaU1tezsRVwScB\n" +
-            "TuhkDMakYauhwNzvfeo2MSHkwsK/x2qezSm/T5OwWoWtobxAQQ6zEX08xfP4myVt\n" +
-            "xzNtBR5yS4dGeM4JpoMeIUAHiBFBoKR/qKBYyXJMPd4Pnu1+yevz3OKW10ajL8vu\n" +
-            "qJmmz6/o5RQWv1htuxRJtGpsBjQ9Ow4O8tYoT0R6imkTG8MD6HtyMSyY0OBISlW0\n" +
-            "tSS8JYRlBjOjAbflz23Mcoh3NyuSfJfxHzp6qnHI+b3jCzzH5VXTVCOPdjJUBe6/\n" +
-            "yIcn5O/r5Rztp/UEgb2xOBgATi2y/sSUJiATl2UfW+Wg5SuA8OoT0bFdPkHokXf3\n" +
-            "2QIDAQAB\n" +
-            "-----END PUBLIC KEY-----";
+    public static final String BANK25_PGP_PUBLIC_KEY = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +
+            "Version: Keybase OpenPGP v1.0.0\n" +
+            "Comment: https://keybase.io/crypto\n" +
+            "\n" +
+            "xo0EXwtXJwEEALIYVpyK1WlpIIGO7kjEtpHyzjhlbz0Vs9YNxYKr625CsipOIxhW\n" +
+            "874znOfo/EIqL0YAoOEiKUQAlCTYL4oaaVcrMbZ2t9JMSiJ0FZrroHCSCyiPYSSH\n" +
+            "MhBVIYC507EBUBLgcCnSqGzXyOhk5OxLxTc2bnc0iGhbz84Pm/eEyO8vABEBAAHN\n" +
+            "GjI1YmFuayA8MjViYW5rQDI1YmFuay5jb20+wq0EEwEKABcFAl8LVycCGy8DCwkH\n" +
+            "AxUKCAIeAQIXgAAKCRDDuvEG5H/yCN4uA/4xA+bf4C8MYgarT0oleNcOQ/MnSIdj\n" +
+            "xm/dvVzI4QEbSnN8YkedXksYL8vUZn1/S8YqYXUSot+rmtC+0x993ZOOFMjqtVCW\n" +
+            "rh3xHWOj+mIGmYY4P4sfqwiPG7Btn3KMgJv2Hcq37n7PMRXahP0zZ7QerK0Gf+AA\n" +
+            "HG4C6xXlMYO1h86NBF8LVycBBADjIfWLIBj99E0pC7ym2NXYEU2HxGGx7lTqX2Cp\n" +
+            "OtQpS4YlcLMsOicQdM8ccVOzGguY3n7bno/sl8qkpIM9FbsgeJqPTkSV/0ISBneI\n" +
+            "X4q2LcIyRPqG8r9xCqGYGRHbt6PJZQTMojK0owvgGYEWus6kEwKFoMhv3E9qKLnv\n" +
+            "nx/OHwARAQABwsCDBBgBCgAPBQJfC1cnBQkPCZwAAhsuAKgJEMO68Qbkf/IInSAE\n" +
+            "GQEKAAYFAl8LVycACgkQ6xu/je4jYIAZHAP/cb7wSIglqNWG9XMCWCtHkphm65HB\n" +
+            "IufMxPIne4mLopLqHu0u8Xk3L8LcA/GFqJmOd6f8qiHuWeHA1vngnyhvNflWE11g\n" +
+            "tBmcHM8YtIC6rRxlfNeg2uAy14VNIjp3vkl62u9XtbDFylzXuRbElk9oYIqoxm+U\n" +
+            "x0g2G7S2OEO0vHVuQAP+O0RIU7YYtAyRJzk/C5fEcNACft66+0T2SyNbTjCeKNzz\n" +
+            "y6eHx77zmsmSsdjVHe1udzNaNRzkNLGSfH3zsiP5QsR9wtRNu0QUyY6pTN1CHGtm\n" +
+            "x+ggn/65sAA3CTjswzoyPcWEE7+QPDPrRISNq4CeKoXRQ7RpYQi6UMKWKGirsdbO\n" +
+            "jQRfC1cnAQQAzKGNR8oILAOZgNWtIjK6sAUu2zYO3ssDuHNB/JXxIbUEfmfwDCbC\n" +
+            "wT8fFFmwgP0OOqUvfvRTgkeb+UqST07Odx/+vQZCONEwZy9p/xMMAtO72cmtU7hB\n" +
+            "TIsAw3sXasjUQFRAJwGlRgsgXQvGJzeHzB2UTyMra/kpj7tq9BdvzDEAEQEAAcLA\n" +
+            "gwQYAQoADwUCXwtXJwUJDwmcAAIbLgCoCRDDuvEG5H/yCJ0gBBkBCgAGBQJfC1cn\n" +
+            "AAoJEAPt/kJy6w689EMEAJ0fxI2bqQI4ksptszqcmf8aHAPENnJmArOOyc+AQ/ts\n" +
+            "4c2wopVazdT/Cai9x5uXjgqMc4OVplVhOPw4XYfdynFHp6iJhlptT2QeXSLKuApy\n" +
+            "Y7s+qRc19CureantXLXE5DgVSrCjbY4AGvNQoJV1FzYNhh0W3S1OQmGnWWR8vugp\n" +
+            "IcUD+QF8F3wZeSnqL50XvraPsghJrbuYtimSFLr48igH5IujlfFc6ukQxy7MFm4B\n" +
+            "xOhsYCCpwb7r5fmiOtzJ1QGQmz3q0+7Wc8mqsTP3SELpy1dXuqVK0Z8hyJD9ylXa\n" +
+            "Vpoww1AiiZU1UdaIDNcyOngZ50z9jD18f2xwk3+I1Vtub7FE\n" +
+            "=EsMv\n" +
+            "-----END PGP PUBLIC KEY BLOCK-----\n";
 
     public static final String SOURCE_PUBLIC_KEYS = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +
             "Version: Keybase OpenPGP v1.0.0\n" +

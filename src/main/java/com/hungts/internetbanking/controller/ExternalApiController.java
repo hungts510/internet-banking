@@ -59,8 +59,8 @@ public class ExternalApiController {
                 decryptedMessage = pgpSecurity.decryptAndVerify(externalRequest.getMessage(),
                         Constant.DEST_PASS_PHRASE,
                         PGPSecurity.ArmoredKeyPair.of(Constant.DEST_PRIVATE_KEYS, Constant.DEST_PUBLIC_KEYS),
-                        Constant.SOURCE_USER_EMAIL,
-                        Constant.SOURCE_PUBLIC_KEYS);
+                        Constant.BANK25_USER_EMAIL,
+                        Constant.BANK25_PGP_PUBLIC_KEY);
 
                 System.out.printf(decryptedMessage);
             } catch (Exception e) {
