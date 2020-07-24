@@ -77,6 +77,8 @@ public class ExternalApiController {
             throw new EzException("Can't parse JSON message");
         }
 
+        System.out.println("Request: " + requestMessage);
+
         if (requestMessage.getRequestTime() == null || requestMessage.getRequestTime() == 0
                 || System.currentTimeMillis() - requestMessage.getRequestTime() > Constant.OTP_AVAILABLE_TIME) {
             throw new EzException("Request expired (5 minutes)");
