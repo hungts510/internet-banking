@@ -64,7 +64,7 @@ public class Constant {
 
     public static final class ExternalRequest {
         public static final class Header {
-            public static final String PARTNER_CODE = "partner-code";
+            public static final String PARTNER_CODE = "Partner-Code";
             public static final String SIGNATURE = "signature";
         }
     }
