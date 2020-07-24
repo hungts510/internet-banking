@@ -337,18 +337,6 @@ public class AccountServiceImpl implements AccountService {
                 Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
 //                Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
                 cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//                int limit = 1024/8 -11;
-//                int position = 0;
-//
-//                while (position < requestInfoString.length()) {
-//                    if (requestInfoString.length() - position < limit) {
-//                        limit = requestInfoString.length() - position;
-//                    }
-//                    byte[] data = cipher.doFinal(requestInfoString.getBytes(), position, limit);
-//                    byteArrayOutputStream.write(data);
-//                    position += limit;
-//                }
 
                 byte[] encryptData = cipher.doFinal(requestInfoString.getBytes());
                 String encryptMessage = Base64.getEncoder().encodeToString(encryptData);
@@ -375,7 +363,7 @@ public class AccountServiceImpl implements AccountService {
                 CloseableHttpResponse response = httpClient.execute(httpPost);
                 String body = EntityUtils.toString(response.getEntity(), "UTF-8");
                 Map<String, Object> mapResponse = objectMapper.readValue(body, Map.class);
-                if ((int) mapResponse.get("code") != 0) {
+                if (response.getStatusLine().getStatusCode() != 200) {
                     throw new EzException("Get account info failed, response: " + mapResponse.get("message"));
                 }
 
