@@ -52,13 +52,23 @@ public class ExternalApiController {
         PGPSecurity pgpSecurity = new PGPSecurity();
         String decryptedMessage = null;
 
+        String publicKeyPartner = null;
+        String partnerEmail = null;
+        if (partnerInfo.getPartnerName().equals(Constant.PartnerName.BANK25)) {
+            publicKeyPartner = Constant.BANK25_PGP_PUBLIC_KEY;
+            partnerEmail = Constant.BANK25_USER_EMAIL;
+        } else if (partnerInfo.getPartnerName().equals(Constant.PartnerName.BANK34)) {
+            publicKeyPartner = Constant.BANK34_PGP_PUBLIC_KEYS;
+            partnerEmail = Constant.BANK34_USER_EMAIL;
+        }
+
         try {
 
             decryptedMessage = pgpSecurity.decryptAndVerify(externalRequest.getMessage(),
                     Constant.DEST_PASS_PHRASE,
                     PGPSecurity.ArmoredKeyPair.of(Constant.DEST_PRIVATE_KEYS, Constant.DEST_PUBLIC_KEYS),
-                    Constant.BANK25_USER_EMAIL,
-                    Constant.BANK25_PGP_PUBLIC_KEY);
+                    partnerEmail,
+                    publicKeyPartner);
 
             System.out.printf(decryptedMessage);
         } catch (Exception e) {
@@ -188,7 +198,7 @@ public class ExternalApiController {
                     Constant.DEST_PASS_PHRASE,
                     PGPSecurity.ArmoredKeyPair.of(Constant.DEST_PRIVATE_KEYS, Constant.DEST_PUBLIC_KEYS),
                     Constant.BANK34_USER_EMAIL,
-                    Constant.BANK34_PUBLIC_KEYS);
+                    Constant.BANK25_PGP_PUBLIC_KEY);
 
             System.out.printf(encryptMessage);
         } catch (Exception e) {

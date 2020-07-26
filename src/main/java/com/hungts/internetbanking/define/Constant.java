@@ -77,6 +77,7 @@ public class Constant {
     public static final class PartnerName {
         public static final String BANK25 = "Bank25";
         public static final String PGP30BANK = "PGP30Bank";
+        public static final String BANK34 = "Bank34";
     }
 
     public static final class PartnerAPI {
@@ -175,7 +176,7 @@ public class Constant {
             "=EsMv\n" +
             "-----END PGP PUBLIC KEY BLOCK-----\n";
 
-    public static final String BANK34_PUBLIC_KEYS = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +
+    public static final String BANK34_PGP_PUBLIC_KEYS = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +
             "Version: Keybase OpenPGP v1.0.0\n" +
             "Comment: https://keybase.io/crypto\n" +
             "\n" +
