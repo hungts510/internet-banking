@@ -9,6 +9,7 @@ public class Constant {
     public static final String DEFAULT_PASSWORD = "123456aA@";
     public static final long OTP_AVAILABLE_TIME = 5*60*1000;
     public static final String BANK_NAME = "30Bank";
+    public static final String BANK_SECRET_KEY = "30Bank";
     public static final String SDF_FORMAT = "yyyy/MM/dd HH:mm:ss";
 
     public static final class AccountType {
@@ -83,8 +84,15 @@ public class Constant {
     public static final class PartnerAPI {
        public static final String BANK_25_ACCOUNT_INFO = "https://bank25.herokuapp.com/api/partner/account-bank/destination-account";
        public static final String BANK_25_RECHARGE_ACCOUNT = "https://bank25.herokuapp.com/api/partner/account-bank/destination-account/recharge";
+       public static final String BANK_34_ACCOUNT_INFO = "https://banking34.herokuapp.com/api/user/";
+       public static final String BANK_34_RECHARGE_ACCOUNT = "https://banking34.herokuapp.com/api/transfer/update";
+
        public static final String BANK_30_SUB_ACCOUNT_INFO = "http://localhost:9808/api/account/info";
        public static final String BANK_30_SUB_RECHARGE_ACCOUNT = "localhost:9808/api/account/recharge";
+    }
+
+    public static final class PartnerSecretKey {
+        public static final String BANK34_SECRET_KEY = "nhom34banking";
     }
 
     public static final String SOURCE_PASS_PHRASE = "12345";

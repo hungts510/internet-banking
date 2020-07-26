@@ -19,9 +19,11 @@ import com.hungts.internetbanking.service.UserService;
 import com.hungts.internetbanking.util.EmailUtil;
 import com.hungts.internetbanking.util.PGPSecurity;
 import com.hungts.internetbanking.util.Utils;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -35,6 +37,7 @@ import zipkin2.Call;
 
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -332,7 +335,7 @@ public class AccountServiceImpl implements AccountService {
                 String publicKeyContent = Constant.BANK25_RSA_PUBLIC_KEY.replaceAll("\n", "").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
                 X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyContent));
                 KeyFactory kf = KeyFactory.getInstance("RSA");
-                PublicKey publicKey =  kf.generatePublic(keySpecX509);
+                PublicKey publicKey = kf.generatePublic(keySpecX509);
 
                 Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
 //                Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
@@ -346,7 +349,8 @@ public class AccountServiceImpl implements AccountService {
 
                 String privateKeyContent = Constant.RSA_PRIVATE_KEY.replaceAll("\n", "").replace("-----BEGIN RSA PRIVATE KEY-----", "").replace("-----END RSA PRIVATE KEY-----", "");
                 PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyContent));
-                PrivateKey privateKey = kf.generatePrivate(keySpecPKCS8);;
+                PrivateKey privateKey = kf.generatePrivate(keySpecPKCS8);
+                ;
                 privateSignature.initSign(privateKey);
                 privateSignature.update(requestInfoString.getBytes(UTF_8));
                 byte[] signature = privateSignature.sign();
@@ -379,57 +383,35 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public ResponseExternalAccountInfo getPGPAccountInfo(String bankName, Long accountNumber) {
         ResponseExternalAccountInfo accountInfo = null;
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        if (bankName.equals(Constant.PartnerName.PGP30BANK)) {
+        if (bankName.equals(Constant.PartnerName.BANK34)) {
             try {
-                Map<String, Object> requestInfo = new HashMap<>();
-                requestInfo.put("account_number", accountNumber);
-                requestInfo.put("request_time", System.currentTimeMillis());
+                long currentTime = System.currentTimeMillis();
+                MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 
-                ObjectMapper objectMapper = new ObjectMapper();
-                String requestInfoString = objectMapper.writeValueAsString(requestInfo);
+                String rawSignature = currentTime + Constant.BANK_SECRET_KEY;
+//                String hashSignature = String.valueOf(messageDigest.digest(rawSignature.getBytes(UTF_8))); //implicit call
+                String hashSignature = DigestUtils.sha256Hex(rawSignature.getBytes()); //implicit call
 
-                PGPSecurity pgpSecurity = new PGPSecurity();
-                String encryptMessage = null;
+                HttpGet httpGet = new HttpGet(Constant.PartnerAPI.BANK_34_ACCOUNT_INFO + accountNumber);
+                httpGet.setHeader("x-time", String.valueOf(currentTime));
+                httpGet.setHeader("x-partner-code", Constant.BANK_NAME);
+                httpGet.setHeader("x-signature", hashSignature);
 
-                try {
-                    encryptMessage = pgpSecurity.encryptAndSign(requestInfoString,
-                            Constant.SOURCE_USER_EMAIL,
-                            Constant.SOURCE_PASS_PHRASE,
-                            PGPSecurity.ArmoredKeyPair.of(Constant.SOURCE_PRIVATE_KEYS, Constant.SOURCE_PUBLIC_KEYS),
-                            Constant.DEST_USER_EMAIL,
-                            Constant.DEST_PUBLIC_KEYS);
-
-                    System.out.printf(encryptMessage);
-                } catch (Exception e) {
-                    throw new EzException("Message invalid: " + e.getMessage());
-                }
-
-
-                Map<String, Object> mapRequest = new HashMap<>();
-                mapRequest.put("message", encryptMessage);
-
-                CloseableHttpClient httpClient = HttpClients.createDefault();
-                HttpPost httpPost = new HttpPost(Constant.PartnerAPI.BANK_30_SUB_ACCOUNT_INFO);
-                StringEntity entity = new StringEntity(objectMapper.writeValueAsString(mapRequest));
-                httpPost.setEntity(entity);
-                httpPost.setHeader("partner-code", Constant.BANK_NAME);
-                httpPost.setHeader("Accept", "application/json");
-                httpPost.setHeader("Content-Type", "application/json");
-
-                CloseableHttpResponse response = httpClient.execute(httpPost);
+                CloseableHttpResponse response = httpClient.execute(httpGet);
                 String body = EntityUtils.toString(response.getEntity(), "UTF-8");
-                Map<String, Object> mapResponse = objectMapper.readValue(body, Map.class);
-                if ((int) mapResponse.get("code") != 0) {
+                Map mapResponse = objectMapper.readValue(body, Map.class);
+                if (response.getStatusLine().getStatusCode() != 200) {
                     throw new EzException("Get account info failed, response: " + mapResponse.get("message"));
                 }
 
-                accountInfo = objectMapper.convertValue(mapResponse.get("data"), ResponseExternalAccountInfo.class);
-                System.out.println(response);
             } catch (Exception e) {
-                throw new EzException("Can't get account info. Error: " + e.getMessage());
+                throw new EzException("Can't get Bank34 account info");
             }
         }
+
         return accountInfo;
     }
 }

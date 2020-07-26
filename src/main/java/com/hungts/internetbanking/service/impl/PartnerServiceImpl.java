@@ -31,7 +31,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     public PartnerInfo getPartnerByPartnerName(String bankName) {
-        Partner partner = partnerRepository.getPartnerByPartnerCode(bankName);
+        Partner partner = partnerRepository.getPartnerByPartnerName(bankName);
 
         if (partner == null) {
             throw new EzException("Partner does not exist");

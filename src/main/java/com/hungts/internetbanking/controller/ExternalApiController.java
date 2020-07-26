@@ -198,7 +198,7 @@ public class ExternalApiController {
                     Constant.DEST_PASS_PHRASE,
                     PGPSecurity.ArmoredKeyPair.of(Constant.DEST_PRIVATE_KEYS, Constant.DEST_PUBLIC_KEYS),
                     Constant.BANK34_USER_EMAIL,
-                    Constant.BANK25_PGP_PUBLIC_KEY);
+                    Constant.BANK34_PGP_PUBLIC_KEYS);
 
             System.out.printf(encryptMessage);
         } catch (Exception e) {
@@ -211,6 +211,13 @@ public class ExternalApiController {
         //Check request expired
         //Get account info
         //Sign and response
+//        StringBuilder stringBuilder = new StringBuilder();
+//        String[] arrMessage = encryptMessage.split("\r\n");
+//        for (String message : arrMessage) {
+//            stringBuilder.append(message);
+////            stringBuilder.append("\\");
+//            stringBuilder.append("\\n");
+//        }
 
         ResponseBody responseBody = new ResponseBody(0, "Success", encryptMessage);
         return EzResponse.response(responseBody);
