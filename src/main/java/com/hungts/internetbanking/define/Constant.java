@@ -91,6 +91,7 @@ public class Constant {
     public static final String SOURCE_USER_EMAIL = "hungts@test.com";
     public static final String DEST_USER_EMAIL = "hungtsdest@test.com";
     public static final String BANK25_USER_EMAIL = "25bank@25bank.com";
+    public static final String BANK34_USER_EMAIL = "ronin32014@gmail.com";
 
     public static final String RSA_PRIVATE_KEY = "-----BEGIN RSA PRIVATE KEY-----\n" +
             "MIIEowIBAAKCAQEAk1AOEwhvRWXC+um7CibbbwMLlCn8IwR4O5yF9LFTGYFiYTEd\n" +
@@ -172,6 +173,40 @@ public class Constant {
             "xOhsYCCpwb7r5fmiOtzJ1QGQmz3q0+7Wc8mqsTP3SELpy1dXuqVK0Z8hyJD9ylXa\n" +
             "Vpoww1AiiZU1UdaIDNcyOngZ50z9jD18f2xwk3+I1Vtub7FE\n" +
             "=EsMv\n" +
+            "-----END PGP PUBLIC KEY BLOCK-----\n";
+
+    public static final String BANK34_PUBLIC_KEYS = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +
+            "Version: Keybase OpenPGP v1.0.0\n" +
+            "Comment: https://keybase.io/crypto\n" +
+            "\n" +
+            "xo0EXsaK0AEEANKBWGQRobFMrwyuELsALiyhz+HJDgf+hiPF+4QXC1YCj5VVBlvR\n" +
+            "K/JE2hs1gVjsAV6nDMcfgMbaguCPb5u3lp8ir/88qQOdyYMLYbUL5L4ir1MbfNhw\n" +
+            "TpMMeCuXwoed/F2BTtgloedCkwmthcaEcrWLHDiV/MEYyq6V1kjHl0cDABEBAAHN\n" +
+            "HkR1YyB0YWkgPHJvbmluMzIwMTRAZ21haWwuY29tPsKtBBMBCgAXBQJexorQAhsv\n" +
+            "AwsJBwMVCggCHgECF4AACgkQCHaebKSUPRZ/zQP+M+zmhUMyWWNiU2yOZDRUsFHS\n" +
+            "3qevkwHLIWHlvrq2rP44gPAk2Phvw7htYK19adJvoEAxFyDH66awha+yWNPi9uFB\n" +
+            "3Tvkbasas2wTf0RZbB0QGnprBTqqf0a+Kj3PfifK/jFvm0zqXoXU5Yme7Xj5alJt\n" +
+            "nvIL/+XKVsOoFMo2h7rOjQRexorQAQQAtFteY9E1lhsBJlD1uX2FnOIjkJoUNQ0o\n" +
+            "hvHaP5ynsFivgKbjrTM5YSgdv8TopJeNqByUk991oLtimeITUQ9BLpWFkvCoQ+ey\n" +
+            "pYk1eG1Nz4UhoGpYMPrT+nqSd6vz7pK+dQcJ7ZzPcgFSc/FtZZ9npGqc0IByqDiM\n" +
+            "pn1RPB1GnNsAEQEAAcLAgwQYAQoADwUCXsaK0AUJDwmcAAIbLgCoCRAIdp5spJQ9\n" +
+            "Fp0gBBkBCgAGBQJexorQAAoJEK+nKFfkuN+JodQEAIjlPDTpVNl2tgzUK7sxHNzC\n" +
+            "kPlXJMtIaaXvWV5FSTOh/SNcpFpcUULgQ1cOyH8T5uzekNnxaJcoz3FajqJNpqGK\n" +
+            "cgo+ESIJPoNxbkajM0uRkUYuWLzrrKDs8JBGRilQX1170sW+WhbZHs/GanSS5AEZ\n" +
+            "jwM87cxvx2+/JnPugSTq/isEAKFRVG7U34pxKAwb4yp2po81zMPhTMnN3vlxtDDG\n" +
+            "Ue+wBwIJWFDnvEhOyeDGWnCEyRlemTaNXVUcDfGYM8JS5Kwn9cfxyNDQ6ujG5mBP\n" +
+            "w61c+Sh5wPPe8ZnsAlAiHmryCRY/K1pGQsCEsaVoUzLlRkpW8/A1JZYizpz9TxSV\n" +
+            "NV3+zo0EXsaK0AEEAMdQbesY9hpC8lr/PrCXMSz61A5NFlbFq4O/Qc1KdthZTgdm\n" +
+            "RRAnjzR2soq2kb2IEtMVY1Dgj+4vbtBbovIRbBegbhpcTQndKFRizDuCBbaFQmwj\n" +
+            "3Ske/mqT5o88cy+ZhTI11BADLIo9L9NV0aJUjchDqXx97iKzAtbb/ce6xisRABEB\n" +
+            "AAHCwIMEGAEKAA8FAl7GitAFCQ8JnAACGy4AqAkQCHaebKSUPRadIAQZAQoABgUC\n" +
+            "XsaK0AAKCRD8JTRgXpBFOFU0A/wMOuI4OPA/aYhcvLa/o2A46KHvfK6Ugr3zt3f/\n" +
+            "YW4DM1ZnadxAGOm1OVdaXCYpYHwL6U+Ndnr65pQkPXhISv9WSUR89bbKRfGQxx2L\n" +
+            "AWfOnBxoAU+U8kbXkZWhwENQK8vEHBDm3xRRFlLp56M4SardG9xRI3HKwBQfvPaE\n" +
+            "VCOKRcYyA/9jchZAQjEgyobBfDhDdWRNAbYUMfIcvFgfnXIvYnnFQI6h1m7SlisE\n" +
+            "CaXJe8SNXyBlK+0EkVtdnbQyroWi4yzT/4Wgb4CGsraH2ZW7JkjoYm/XdgolYKEM\n" +
+            "2DjM88WcSaX+3NPdMOSUNuCIfHit/2AxghMcCwpNkvlAz52UjySOag==\n" +
+            "=sMbW\n" +
             "-----END PGP PUBLIC KEY BLOCK-----\n";
 
     public static final String SOURCE_PUBLIC_KEYS = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" +

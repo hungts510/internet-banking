@@ -49,8 +49,6 @@ public class ExternalApiController {
         }
 
         AccountInfo accountInfo = null;
-
-
         PGPSecurity pgpSecurity = new PGPSecurity();
         String decryptedMessage = null;
 
@@ -186,11 +184,11 @@ public class ExternalApiController {
             String requestMessage = objectMapper.writeValueAsString(externalRequest);
 
             encryptMessage = pgpSecurity.encryptAndSign(requestMessage,
-                    Constant.SOURCE_USER_EMAIL,
-                    Constant.SOURCE_PASS_PHRASE,
-                    PGPSecurity.ArmoredKeyPair.of(Constant.SOURCE_PRIVATE_KEYS, Constant.SOURCE_PUBLIC_KEYS),
                     Constant.DEST_USER_EMAIL,
-                    Constant.DEST_PUBLIC_KEYS);
+                    Constant.DEST_PASS_PHRASE,
+                    PGPSecurity.ArmoredKeyPair.of(Constant.DEST_PRIVATE_KEYS, Constant.DEST_PUBLIC_KEYS),
+                    Constant.BANK34_USER_EMAIL,
+                    Constant.BANK34_PUBLIC_KEYS);
 
             System.out.printf(encryptMessage);
         } catch (Exception e) {
