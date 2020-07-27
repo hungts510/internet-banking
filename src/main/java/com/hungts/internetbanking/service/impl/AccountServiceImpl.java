@@ -121,6 +121,42 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public TransactionInfo receiverMoneyFromExternalBank(String fromBank, long amount, String description, long accountNumber, String signature) {
+        Account account = accountRepository.getAccountFullInfoByAccountNumber(accountNumber);
+
+        if (account == null) {
+            throw new EzException("Account does not exist");
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setFromBank(fromBank);
+        transaction.setToBank(Constant.BANK_NAME);
+        transaction.setAmount(amount);
+        transaction.setDescription(description);
+        transaction.setType(Constant.TransactionType.TRANSFER);
+        transaction.setStatus(Constant.TransactionStatus.SUCCESS);
+        transaction.setToAccountNumber(account.getAccountNumber());
+        transaction.setCreatedAt(new Date());
+        transaction.setUpdatedAt(new Date());
+
+        transactionRepository.saveTransaction(transaction);
+        if (transaction.getId() == null) {
+            throw new EzException("An error occurred while saving transaction");
+        }
+
+        long newBalance = account.getBalance() + transaction.getAmount();
+        accountRepository.updateAccountBalance(newBalance, account.getId());
+
+        TransactionSignature transactionSignature = new TransactionSignature();
+        transactionSignature.setTransactionId(transaction.getId());
+        transactionSignature.setSignature(signature);
+        transactionSignature.setCreatedAt(new Date());
+        transactionSignature.setUpdatedAt(new Date());
+        transactionSignatureRepository.saveTransactionSignature(transactionSignature);
+        return transactionMapper.transactionToTransactionInfo(transaction);
+    }
+
+    @Override
     public void payInToAccount(TransactionRequest transactionRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String phoneNumber = authentication.getName();

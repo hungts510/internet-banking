@@ -8,6 +8,7 @@ import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.model.info.AccountInfo;
 import com.hungts.internetbanking.model.info.PartnerInfo;
 import com.hungts.internetbanking.model.info.ResponseExternalAccountInfo;
+import com.hungts.internetbanking.model.info.TransactionInfo;
 import com.hungts.internetbanking.model.request.ExternalRequest;
 import com.hungts.internetbanking.model.response.EzResponse;
 import com.hungts.internetbanking.model.response.ResponseBody;
@@ -130,46 +131,47 @@ public class ExternalApiController {
 
         AccountInfo accountInfo = null;
 
-        if (partnerInfo.getPartnerType().equals(Constant.PartnerType.PGP)) {
-            PGPSecurity pgpSecurity = new PGPSecurity();
-            String decryptedMessage = null;
+        PGPSecurity pgpSecurity = new PGPSecurity();
+        String decryptedMessage = null;
 
-            try {
+        try {
 
-                decryptedMessage = pgpSecurity.decryptAndVerify(externalRequest.getMessage(),
-                        Constant.DEST_PASS_PHRASE,
-                        PGPSecurity.ArmoredKeyPair.of(Constant.DEST_PRIVATE_KEYS, Constant.DEST_PUBLIC_KEYS),
-                        Constant.SOURCE_USER_EMAIL,
-                        Constant.SOURCE_PUBLIC_KEYS);
+            decryptedMessage = pgpSecurity.decryptAndVerify(externalRequest.getMessage(),
+                    Constant.DEST_PASS_PHRASE,
+                    PGPSecurity.ArmoredKeyPair.of(Constant.DEST_PRIVATE_KEYS, Constant.DEST_PUBLIC_KEYS),
+                    Constant.SOURCE_USER_EMAIL,
+                    Constant.SOURCE_PUBLIC_KEYS);
 
-                System.out.printf(decryptedMessage);
-            } catch (Exception e) {
-                throw new EzException("Message invalid: " + e.getMessage());
-            }
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-            ExternalRequest requestMessage = null;
-            try {
-                requestMessage = objectMapper.readValue(decryptedMessage, ExternalRequest.class);
-            } catch (Exception e) {
-                throw new EzException("Can't parse JSON message");
-            }
-
-            if (requestMessage.getRequestTime() == null || requestMessage.getRequestTime() == 0
-                    || System.currentTimeMillis() - requestMessage.getRequestTime() > Constant.OTP_AVAILABLE_TIME) {
-                throw new EzException("Request expired (5 minutes)");
-            }
-
-            if (requestMessage.getAccountNumber() == null || requestMessage.getAccountNumber() < 0) {
-                throw new EzException("Missing account number");
-            }
-
-            if (requestMessage.getAmount() == null || requestMessage.getAmount() < 0) {
-                throw new EzException("Missing amount");
-            }
+            System.out.printf(decryptedMessage);
+        } catch (Exception e) {
+            throw new EzException("Message invalid: " + e.getMessage());
         }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        ExternalRequest requestMessage = null;
+        try {
+            requestMessage = objectMapper.readValue(decryptedMessage, ExternalRequest.class);
+        } catch (Exception e) {
+            throw new EzException("Can't parse JSON message");
+        }
+
+        if (requestMessage.getRequestTime() == null || requestMessage.getRequestTime() == 0
+                || System.currentTimeMillis() - requestMessage.getRequestTime() > Constant.OTP_AVAILABLE_TIME) {
+            throw new EzException("Request expired (5 minutes)");
+        }
+
+        if (requestMessage.getAccountNumber() == null || requestMessage.getAccountNumber() < 0) {
+            throw new EzException("Missing account number");
+        }
+
+        if (requestMessage.getAmount() == null || requestMessage.getAmount() < 0) {
+            throw new EzException("Missing amount");
+        }
+
+        TransactionInfo transactionInfo = accountService.receiverMoneyFromExternalBank(partnerInfo.getPartnerName(), requestMessage.getAmount(), "", requestMessage.getAccountNumber(), externalRequest.getMessage());
+
         //Get public key of partner
         //Verify request
         //Check request expired
@@ -180,7 +182,7 @@ public class ExternalApiController {
 //        externalAccountInfo.setAccountName(accountInfo.getAccountName());
 //        externalAccountInfo.setAccountNumber(accountInfo.getAccountNumber());
 //        externalAccountInfo.setAccountType("Tài khoản thanh toán");
-        ResponseBody responseBody = new ResponseBody(0, "Success");
+        ResponseBody responseBody = new ResponseBody(0, "Success", transactionInfo);
         return EzResponse.response(responseBody);
     }
 

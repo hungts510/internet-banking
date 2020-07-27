@@ -15,6 +15,8 @@ public interface AccountService {
 
     AccountInfo getAccountInfoByAccountNumber(long accountNumber);
 
+    TransactionInfo receiverMoneyFromExternalBank(String fromBank, long amount, String description, long accountNumber, String signature);
+
     void payInToAccount(TransactionRequest transactionRequest);
 
     TransactionInfo createTransferMoneyTransaction(TransactionRequest transactionRequest);
