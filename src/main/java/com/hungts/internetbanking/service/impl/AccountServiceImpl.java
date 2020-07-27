@@ -432,7 +432,6 @@ public class AccountServiceImpl implements AccountService {
         String signature = StringUtils.EMPTY;
         ObjectMapper objectMapper = new ObjectMapper();
         CloseableHttpClient httpClient = HttpClients.createDefault();
-
         long transactionAmount = transaction.getAmount();
         if (!transaction.isPayFee()) {
             transactionAmount -= Constant.TRANSFER_EXTERNAL_FEE;
@@ -505,11 +504,6 @@ public class AccountServiceImpl implements AccountService {
 //                String hashSignature = String.valueOf(messageDigest.digest(rawSignature.getBytes(UTF_8))); //implicit call
                 String hashSignature = DigestUtils.sha256Hex(rawSignature.getBytes()); //implicit call
 
-                HttpGet httpGet = new HttpGet(Constant.PartnerAPI.BANK_34_ACCOUNT_INFO);
-                httpGet.setHeader("x-time", String.valueOf(currentTime));
-                httpGet.setHeader("x-partner-code", Constant.BANK_NAME);
-                httpGet.setHeader("x-hash", hashSignature);
-
                 PGPSecurity pgpSecurity = new PGPSecurity();
                 String encryptMessage = pgpSecurity.encryptAndSign(requestBodyString,
                         Constant.DEST_USER_EMAIL,
@@ -521,6 +515,9 @@ public class AccountServiceImpl implements AccountService {
                 requestBody.put("message", encryptMessage);
 
                 HttpPost httpPost = new HttpPost(Constant.PartnerAPI.BANK_34_RECHARGE_ACCOUNT);
+                httpPost.setHeader("x-time", String.valueOf(currentTime));
+                httpPost.setHeader("x-partner-code", Constant.BANK_NAME);
+                httpPost.setHeader("x-hash", hashSignature);
                 StringEntity entity = new StringEntity(objectMapper.writeValueAsString(requestBody));
                 httpPost.setEntity(entity);
                 httpPost.setHeader("Accept", "application/json");
