@@ -127,7 +127,7 @@ public class AccountController {
         return EzResponse.response(responseBody);
     }
 
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_CUSTOMER')")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
     @RequestMapping(value = ContextPath.Account.LIST_PARTNERS, method = RequestMethod.GET)
     public ResponseEntity<?> listPartners() {
         List<PartnerInfo> partnerInfoList = partnerService.getListPartners();
