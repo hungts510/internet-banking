@@ -1,9 +1,7 @@
 package com.hungts.internetbanking.service;
 
-import com.hungts.internetbanking.model.info.AccountInfo;
-import com.hungts.internetbanking.model.info.ResponseExternalAccountInfo;
-import com.hungts.internetbanking.model.info.TransactionInfo;
-import com.hungts.internetbanking.model.info.TransactionMetaData;
+import com.hungts.internetbanking.model.entity.Transaction;
+import com.hungts.internetbanking.model.info.*;
 import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.TransactionRequest;
 
@@ -27,4 +25,8 @@ public interface AccountService {
     ResponseExternalAccountInfo getRSAAccountInfo(String bankName, Long accountNumber);
 
     ResponseExternalAccountInfo getPGPAccountInfo(String bankName, Long accountNumber);
+
+    String transferMoneyToExternalBank(Transaction transaction, String accountName);
+
+    void transferMoneyToPGPBank();
 }

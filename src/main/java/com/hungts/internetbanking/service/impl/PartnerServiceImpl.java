@@ -9,6 +9,9 @@ import com.hungts.internetbanking.service.PartnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class PartnerServiceImpl implements PartnerService {
 
@@ -38,5 +41,11 @@ public class PartnerServiceImpl implements PartnerService {
         }
 
         return partnerMapper.partnerToPartnerInfo(partner);
+    }
+
+    @Override
+    public List<PartnerInfo> getListPartners() {
+        List<Partner> partners = partnerRepository.getListPartners();
+        return partners.stream().map(partner -> partnerMapper.partnerToPartnerInfo(partner)).collect(Collectors.toList());
     }
 }

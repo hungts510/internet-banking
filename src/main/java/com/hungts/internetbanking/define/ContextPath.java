@@ -30,6 +30,7 @@ public class ContextPath {
         public static final String TRANSFER = "/transfer";
         public static final String CAPTURE_TRANSFER = "/capture-transfer";
         public static final String LIST_TRANSACTIONS = "/list-transactions";
+        public static final String LIST_PARTNERS = "/list-partners";
     }
 
     public static final class Employee {

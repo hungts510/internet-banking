@@ -4,6 +4,8 @@ import com.hungts.internetbanking.model.entity.Partner;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Mapper
 @Repository
 public interface PartnerRepository {
@@ -23,4 +25,8 @@ public interface PartnerRepository {
     @Select("SELECT * FROM partner WHERE partner_name = #{partnerName}")
     @ResultMap("PartnerObject")
     Partner getPartnerByPartnerName(String partnerName);
+
+    @Select("SELECT * FROM partner")
+    @ResultMap("PartnerObject")
+    List<Partner> getListPartners();
 }

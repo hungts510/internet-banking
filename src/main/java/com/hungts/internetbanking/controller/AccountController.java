@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.xml.ws.Response;
 import java.io.ObjectInput;
+import java.util.List;
 
 @CrossOrigin(maxAge = 3600)
 @RestController
@@ -123,6 +124,14 @@ public class AccountController {
 
         TransactionMetaData transactionMetaData = accountService.getListAccountTransaction(accountRequest);
         ResponseBody responseBody = new ResponseBody(0, "Success", transactionMetaData);
+        return EzResponse.response(responseBody);
+    }
+
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_CUSTOMER')")
+    @RequestMapping(value = ContextPath.Account.LIST_PARTNERS, method = RequestMethod.GET)
+    public ResponseEntity<?> listPartners() {
+        List<PartnerInfo> partnerInfoList = partnerService.getListPartners();
+        ResponseBody responseBody = new ResponseBody(0, "Success", partnerInfoList);
         return EzResponse.response(responseBody);
     }
 }

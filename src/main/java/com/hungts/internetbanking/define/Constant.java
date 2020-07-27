@@ -11,6 +11,8 @@ public class Constant {
     public static final String BANK_NAME = "30Bank";
     public static final String BANK_SECRET_KEY = "30Bank";
     public static final String SDF_FORMAT = "yyyy/MM/dd HH:mm:ss";
+    public static final long TRANSFER_EXTERNAL_FEE = 7700;
+    public static final String DEFAULT_TRANSFER_MESSAGE = "Transfer 30Bank. STK: ";
 
     public static final class AccountType {
         public static final Integer SPEND_ACCOUNT = 1;

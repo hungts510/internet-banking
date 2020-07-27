@@ -32,6 +32,7 @@ public interface TransactionRepository {
             @Result(column = "to_bank", property = "toBank"),
             @Result(column = "otp", property = "otp"),
             @Result(column = "debt_id", property = "debtId"),
+            @Result(column = "is_pay_fee", property = "isPayFee")
     })
     Transaction getUserTransactionByIdAndStatus(int transactionId, int userId, int status);
 
