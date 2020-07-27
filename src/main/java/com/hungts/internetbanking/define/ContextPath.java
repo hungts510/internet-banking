@@ -49,4 +49,9 @@ public class ContextPath {
         public static final String GENERATE_MESSAGE = "/generate-message";
         public static final String RECHARGE = "/recharge";
     }
+
+    public static final class Admin {
+        public static final String ADMIN = "/admin";
+        public static final String STATISTIC = "/statistic";
+    }
 }

@@ -130,7 +130,7 @@ public class AccountServiceImpl implements AccountService {
             throw new EzException("User does not exist");
         }
 
-        Account userAccount = accountRepository.getCustomerAccountByAccountNumber(transactionRequest.getToAccountNumber());
+        Account userAccount = accountRepository.getAccountFullInfoByAccountNumber(transactionRequest.getToAccountNumber());
         if (userAccount == null) {
             throw new EzException("Account does not exist");
         }
@@ -541,7 +541,40 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void transferMoneyToPGPBank() {
+    public StatisticInfo bankStatistic(Date dateFrom, Date dateTo, String bankName) {
+        List<Transaction> listTransactionToBank = new LinkedList<>();
+        List<Transaction> listTransactionFromBank = new LinkedList<>();
 
+        if (ObjectUtils.isNotEmpty(bankName)) {
+            listTransactionToBank = transactionRepository.getListTransactionByStatusToBank(Constant.TransactionStatus.SUCCESS, bankName, dateFrom, dateTo);
+            listTransactionFromBank = transactionRepository.getListTransactionByStatusFromBank(Constant.TransactionStatus.SUCCESS, bankName, dateFrom, dateTo);
+        } else {
+            listTransactionToBank = transactionRepository.getListTransactionByStatusToExternalBank(Constant.TransactionStatus.SUCCESS, Constant.BANK_NAME, dateFrom, dateTo);
+            listTransactionFromBank = transactionRepository.getListTransactionByStatusFromExternalBank(Constant.TransactionStatus.SUCCESS, Constant.BANK_NAME, dateFrom, dateTo);
+        }
+
+        List<TransactionInfo> transactionInfosToBank = new LinkedList<>();
+        List<TransactionInfo> transactionInfosFromBank = new LinkedList<>();
+
+        long totalToBank = 0;
+        long totalFromBank = 0;
+        for (Transaction transaction : listTransactionToBank) {
+            transactionInfosToBank.add(transactionMapper.transactionToTransactionInfo(transaction));
+            totalToBank += transaction.getAmount();
+        }
+
+        for (Transaction transaction : listTransactionFromBank) {
+            transactionInfosFromBank.add(transactionMapper.transactionToTransactionInfo(transaction));
+            totalFromBank += transaction.getAmount();
+        }
+
+        StatisticInfo statisticInfo = new StatisticInfo();
+        statisticInfo.setListTransactionTo(transactionInfosToBank);
+        statisticInfo.setListTransactionFrom(transactionInfosFromBank);
+        statisticInfo.setTotalTo(totalToBank);
+        statisticInfo.setTotalFrom(totalFromBank);
+        statisticInfo.setBankName(bankName);
+
+        return statisticInfo;
     }
 }

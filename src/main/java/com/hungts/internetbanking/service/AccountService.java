@@ -5,6 +5,7 @@ import com.hungts.internetbanking.model.info.*;
 import com.hungts.internetbanking.model.request.AccountRequest;
 import com.hungts.internetbanking.model.request.TransactionRequest;
 
+import java.util.Date;
 import java.util.List;
 
 public interface AccountService {
@@ -28,5 +29,5 @@ public interface AccountService {
 
     String transferMoneyToExternalBank(Transaction transaction, String accountName);
 
-    void transferMoneyToPGPBank();
+    StatisticInfo bankStatistic(Date dateFrom, Date dateTo, String bankName);
 }
