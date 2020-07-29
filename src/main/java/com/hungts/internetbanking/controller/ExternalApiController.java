@@ -134,15 +134,28 @@ public class ExternalApiController {
         PGPSecurity pgpSecurity = new PGPSecurity();
         String decryptedMessage = null;
 
+        String publicKeyPartner = null;
+        String partnerEmail = null;
+        if (partnerInfo.getPartnerName().equals(Constant.PartnerName.BANK25)) {
+            publicKeyPartner = Constant.BANK25_PGP_PUBLIC_KEY;
+            partnerEmail = Constant.BANK25_USER_EMAIL;
+        } else if (partnerInfo.getPartnerName().equals(Constant.PartnerName.BANK34)) {
+            publicKeyPartner = Constant.BANK34_PGP_PUBLIC_KEYS;
+            partnerEmail = Constant.BANK34_USER_EMAIL;
+        } else if (partnerInfo.getPartnerName().equals(Constant.PartnerName.BANK30SUB)) {
+            publicKeyPartner = Constant.SOURCE_PUBLIC_KEYS;
+            partnerEmail = Constant.SOURCE_USER_EMAIL;
+        } else {
+            throw new EzException("Partner not exist");
+        }
+
         try {
 
             decryptedMessage = pgpSecurity.decryptAndVerify(externalRequest.getMessage(),
                     Constant.DEST_PASS_PHRASE,
                     PGPSecurity.ArmoredKeyPair.of(Constant.DEST_PRIVATE_KEYS, Constant.DEST_PUBLIC_KEYS),
-                    Constant.SOURCE_USER_EMAIL,
-                    Constant.SOURCE_PUBLIC_KEYS);
-
-            System.out.printf(decryptedMessage);
+                    partnerEmail,
+                    publicKeyPartner);
         } catch (Exception e) {
             throw new EzException("Message invalid: " + e.getMessage());
         }
@@ -196,11 +209,11 @@ public class ExternalApiController {
             String requestMessage = objectMapper.writeValueAsString(externalRequest);
 
             encryptMessage = pgpSecurity.encryptAndSign(requestMessage,
+                    Constant.SOURCE_USER_EMAIL,
+                    Constant.SOURCE_PASS_PHRASE,
+                    PGPSecurity.ArmoredKeyPair.of(Constant.SOURCE_PRIVATE_KEYS, Constant.SOURCE_PUBLIC_KEYS),
                     Constant.DEST_USER_EMAIL,
-                    Constant.DEST_PASS_PHRASE,
-                    PGPSecurity.ArmoredKeyPair.of(Constant.DEST_PRIVATE_KEYS, Constant.DEST_PUBLIC_KEYS),
-                    Constant.BANK34_USER_EMAIL,
-                    Constant.BANK34_PGP_PUBLIC_KEYS);
+                    Constant.DEST_PUBLIC_KEYS);
 
             System.out.printf(encryptMessage);
         } catch (Exception e) {

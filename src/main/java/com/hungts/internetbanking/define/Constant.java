@@ -1,9 +1,5 @@
 package com.hungts.internetbanking.define;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 public class Constant {
     public static final String ACCOUNT_NUMBER_PREFIX = "53210000";
     public static final String DEFAULT_PASSWORD = "123456aA@";
@@ -79,7 +75,7 @@ public class Constant {
 
     public static final class PartnerName {
         public static final String BANK25 = "Bank25";
-        public static final String PGP30BANK = "PGP30Bank";
+        public static final String BANK30SUB = "30SubBank";
         public static final String BANK34 = "Bank34";
     }
 
