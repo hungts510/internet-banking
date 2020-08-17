@@ -4,10 +4,8 @@ import com.hungts.internetbanking.define.Constant;
 import com.hungts.internetbanking.define.ContextPath;
 import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.model.info.*;
-import com.hungts.internetbanking.model.request.AccountRequest;
-import com.hungts.internetbanking.model.request.ChangePasswordRequest;
-import com.hungts.internetbanking.model.request.DebtorRequest;
-import com.hungts.internetbanking.model.request.UserRequest;
+import com.hungts.internetbanking.model.request.*;
+import com.hungts.internetbanking.model.response.AuthenticateResponse;
 import com.hungts.internetbanking.model.response.DebtorInfoResponse;
 import com.hungts.internetbanking.model.response.EzResponse;
 import com.hungts.internetbanking.model.response.ResponseBody;
@@ -300,6 +298,21 @@ public class UserController {
 
         userService.readAllNotificationByUserId(userInfo.getUserId());
         ResponseBody responseBody = new ResponseBody(0, "Success");
+        return EzResponse.response(responseBody);
+    }
+
+    @RequestMapping(value = ContextPath.User.REFRESH_TOKEN, method = RequestMethod.POST)
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+        if (StringUtils.isEmpty(refreshTokenRequest.getRefreshToken())) {
+            throw new EzException("Missing refresh token field");
+        }
+
+        if (StringUtils.isEmpty(refreshTokenRequest.getPhone())) {
+            throw new EzException("Missing phone field");
+        }
+
+        AuthenticateResponse authenticateResponse = userService.refreshToken(refreshTokenRequest);
+        ResponseBody responseBody = new ResponseBody(0, "Success", authenticateResponse);
         return EzResponse.response(responseBody);
     }
 }

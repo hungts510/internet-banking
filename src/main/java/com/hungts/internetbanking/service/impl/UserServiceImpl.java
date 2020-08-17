@@ -9,7 +9,9 @@ import com.hungts.internetbanking.mapper.UserMapper;
 import com.hungts.internetbanking.model.entity.*;
 import com.hungts.internetbanking.model.info.*;
 import com.hungts.internetbanking.model.request.DebtorRequest;
+import com.hungts.internetbanking.model.request.RefreshTokenRequest;
 import com.hungts.internetbanking.model.request.UserRequest;
+import com.hungts.internetbanking.model.response.AuthenticateResponse;
 import com.hungts.internetbanking.repository.*;
 import com.hungts.internetbanking.service.AccountService;
 import com.hungts.internetbanking.service.UserService;
@@ -69,6 +71,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Autowired
     NotificationMapper notificationMapper;
+
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
 
     @Override
     public UserInfo createUser(UserRequest userRequest) throws EzException {
@@ -431,5 +436,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void readAllNotificationByUserId(Integer userId) {
         notificationRepository.updateAllUserNotificationStatus(Constant.NotificationStatus.READ, userId);
+    }
+
+    @Override
+    public AuthenticateResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+        UserDetails userDetails = loadUserByUsername(refreshTokenRequest.getPhone());
+
+        User user = userRepository.getUserByPhoneNumber(userDetails.getUsername());
+        if (!refreshTokenRequest.getRefreshToken().equals(user.getRefreshToken())) {
+            throw new EzException("Refresh token not match");
+        }
+
+        AuthenticateResponse authenticateResponse = new AuthenticateResponse();
+        authenticateResponse.setAccessToken(jwtTokenUtil.generateToken(userDetails));
+        return authenticateResponse;
+    }
+
+    public void saveRefreshToken(String refreshToken, String phone) {
+        userRepository.saveRefreshToken(refreshToken, phone);
     }
 }

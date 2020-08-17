@@ -6,7 +6,9 @@ import com.hungts.internetbanking.model.info.NotificationInfo;
 import com.hungts.internetbanking.model.info.TransactionInfo;
 import com.hungts.internetbanking.model.info.UserInfo;
 import com.hungts.internetbanking.model.request.DebtorRequest;
+import com.hungts.internetbanking.model.request.RefreshTokenRequest;
 import com.hungts.internetbanking.model.request.UserRequest;
+import com.hungts.internetbanking.model.response.AuthenticateResponse;
 
 import java.util.List;
 
@@ -42,4 +44,6 @@ public interface UserService {
     NotificationInfo updateNotificationStatus(Integer notificationId);
 
     void readAllNotificationByUserId(Integer userId);
+
+    AuthenticateResponse refreshToken(RefreshTokenRequest refreshTokenRequest);
 }

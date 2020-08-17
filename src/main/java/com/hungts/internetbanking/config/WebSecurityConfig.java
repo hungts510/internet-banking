@@ -1,7 +1,6 @@
 package com.hungts.internetbanking.config;
 
 import com.hungts.internetbanking.filter.AuthenticationFilter;
-import com.hungts.internetbanking.filter.SimpleCORSFilter;
 import com.hungts.internetbanking.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,11 +15,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import sun.java2d.pipe.SpanShapeRenderer;
 
 @Configuration
 @EnableWebSecurity
@@ -56,7 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors().and().csrf().disable()
                 .authorizeRequests().antMatchers("/authenticate", "/user/forgot-password", "/user/reset-password",
-                "/api/account/info", "/api/account/generate-message", "/api/account/recharge")
+                "/api/account/info", "/api/account/generate-message", "/api/account/recharge", "/user/refresh-token")
                 .permitAll().
                 anyRequest().authenticated().and().
                 exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()

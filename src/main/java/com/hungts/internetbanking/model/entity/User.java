@@ -19,4 +19,7 @@ public class User {
 
     @JsonProperty("phone")
     private String phone;
+
+    @JsonProperty("refresh_token")
+    private String refreshToken;
 }

@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 public class JwtTokenUtil implements Serializable {
     private static final long serialVersionUID = -2550185165626007488L;
 
-    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+    public static final long JWT_TOKEN_VALIDITY = 5 * 60;
+    public static final long JWT_REFRESH_TOKEN_VALIDITY = 2 * 365 * 24 * 60 * 60;
 
     private static String secret = "30_internet-banking_aA@";
 
@@ -56,6 +57,20 @@ public class JwtTokenUtil implements Serializable {
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .compact();
+    }
+
+    public static String generateRefreshToken(UserDetails userDetails) {
+        final String authorities = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .claim("auth", authorities)
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_REFRESH_TOKEN_VALIDITY * 1000))
                 .compact();
     }
 

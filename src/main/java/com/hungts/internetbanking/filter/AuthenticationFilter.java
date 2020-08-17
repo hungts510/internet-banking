@@ -1,7 +1,6 @@
 package com.hungts.internetbanking.filter;
 
-import com.hungts.internetbanking.model.info.UserInfo;
-import com.hungts.internetbanking.service.UserService;
+import com.hungts.internetbanking.exception.EzException;
 import com.hungts.internetbanking.service.impl.UserServiceImpl;
 import com.hungts.internetbanking.util.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -41,6 +40,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 System.out.println("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT Token has expired");
+                throw new EzException("Token has expired");
             }
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
