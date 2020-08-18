@@ -31,7 +31,7 @@ public interface UserRepository {
     @Results(
             id = "UserObject", value = {
             @Result(column = "id", property = "id", id = true),
-            @Result(column = "full_name", property = "fullName"),
+            @Result(column = "fullname", property = "fullName"),
             @Result(column = "password", property = "password"),
             @Result(column = "email", property = "email"),
             @Result(column = "phone", property = "phone"),

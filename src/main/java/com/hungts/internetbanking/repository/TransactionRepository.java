@@ -40,27 +40,27 @@ public interface TransactionRepository {
     @Update("UPDATE transactions SET status = #{status} WHERE id = #{transactionId}")
     void updateTransactionStatus(int status, int transactionId);
 
-    @Select("SELECT * FROM transactions WHERE type = #{type} AND from_account_number = #{fromAccountNumber} AND status != 2 ORDER BY created_at DESC")
+    @Select("SELECT * FROM transactions WHERE type = #{type} AND from_account_number = #{fromAccountNumber} AND status != 2 AND updated_at > (NOW( ) - INTERVAL 1 MONTH) ORDER BY created_at DESC")
     @ResultMap("TransactionObject")
     List<Transaction> getListTransactionByTypeFromAccount(int type, long fromAccountNumber);
 
-    @Select("SELECT * FROM transactions WHERE type = #{type} AND to_account_number = #{toAccountNumber} AND status != 2 ORDER BY created_at DESC")
+    @Select("SELECT * FROM transactions WHERE type = #{type} AND to_account_number = #{toAccountNumber} AND status != 2 AND updated_at > (NOW( ) - INTERVAL 1 MONTH) ORDER BY created_at DESC")
     @ResultMap("TransactionObject")
     List<Transaction> getListTransactionByTypeToAccount(int type, long toAccountNumber);
 
-    @Select("SELECT * FROM transactions WHERE status = #{status} AND to_bank LIKE '%' #{bankName} '%' AND created_at >= #{dateFrom} AND created_at <= #{dateTo} ORDER BY created_at DESC")
+    @Select("SELECT * FROM transactions WHERE status = #{status} AND to_bank LIKE '%' #{bankName} '%' AND created_at >= #{dateFrom} AND created_at <= #{dateTo} AND updated_at > (NOW( ) - INTERVAL 1 MONTH) ORDER BY created_at DESC")
     @ResultMap("TransactionObject")
     List<Transaction> getListTransactionByStatusToBank(int status, String bankName, Date dateFrom, Date dateTo);
 
-    @Select("SELECT * FROM transactions WHERE status = #{status} AND from_bank LIKE '%' #{bankName} '%' AND created_at >= #{dateFrom} AND created_at <= #{dateTo} ORDER BY created_at DESC")
+    @Select("SELECT * FROM transactions WHERE status = #{status} AND from_bank LIKE '%' #{bankName} '%' AND created_at >= #{dateFrom} AND created_at <= #{dateTo} AND updated_at >  (NOW( ) - INTERVAL 1 MONTH) ORDER BY created_at DESC")
     @ResultMap("TransactionObject")
     List<Transaction> getListTransactionByStatusFromBank(int status, String bankName, Date dateFrom, Date dateTo);
 
-    @Select("SELECT * FROM transactions WHERE status = #{status} AND to_bank NOT LIKE '%' #{bankName} '%' AND created_at >= #{dateFrom} AND created_at <= #{dateTo} ORDER BY created_at DESC")
+    @Select("SELECT * FROM transactions WHERE status = #{status} AND to_bank NOT LIKE '%' #{bankName} '%' AND created_at >= #{dateFrom} AND created_at <= #{dateTo} AND updated_at >  (NOW( ) - INTERVAL 1 MONTH) ORDER BY created_at DESC")
     @ResultMap("TransactionObject")
     List<Transaction> getListTransactionByStatusToExternalBank(int status, String bankName, Date dateFrom, Date dateTo);
 
-    @Select("SELECT * FROM transactions WHERE status = #{status} AND from_bank NOT LIKE '%' #{bankName} '%' AND created_at >= #{dateFrom} AND created_at <= #{dateTo} ORDER BY created_at DESC")
+    @Select("SELECT * FROM transactions WHERE status = #{status} AND from_bank NOT LIKE '%' #{bankName} '%' AND created_at >= #{dateFrom} AND created_at <= #{dateTo} AND updated_at >  (NOW( ) - INTERVAL 1 MONTH) ORDER BY created_at DESC")
     @ResultMap("TransactionObject")
     List<Transaction> getListTransactionByStatusFromExternalBank(int status, String bankName, Date dateFrom, Date dateTo);
 }

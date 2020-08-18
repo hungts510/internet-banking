@@ -69,10 +69,6 @@ public class UserController {
             throw new EzException("Missing field account number");
         }
 
-        if (StringUtils.isBlank(accountRequest.getAccountName())) {
-            throw new EzException("Missing field account name");
-        }
-
         receiverService.createReceiver(accountRequest);
         ResponseBody responseBody = new ResponseBody(0, "Success");
         return EzResponse.response(responseBody);
