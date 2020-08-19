@@ -8,6 +8,9 @@ public class ExternalRequest {
     @JsonProperty(value = "message")
     private String message;
 
+    @JsonProperty(value = "from_account_number")
+    private Long fromAccountNumber;
+
     @JsonProperty(value = "account_number")
     private Long accountNumber;
 

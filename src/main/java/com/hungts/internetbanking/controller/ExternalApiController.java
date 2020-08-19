@@ -175,6 +175,10 @@ public class ExternalApiController {
             throw new EzException("Request expired (5 minutes)");
         }
 
+        if (requestMessage.getFromAccountNumber() == null || requestMessage.getFromAccountNumber() < 0) {
+            throw new EzException("Missing from account number");
+        }
+
         if (requestMessage.getAccountNumber() == null || requestMessage.getAccountNumber() < 0) {
             throw new EzException("Missing account number");
         }
@@ -183,7 +187,7 @@ public class ExternalApiController {
             throw new EzException("Missing amount");
         }
 
-        TransactionInfo transactionInfo = accountService.receiverMoneyFromExternalBank(partnerInfo.getPartnerName(), requestMessage.getAmount(), "", requestMessage.getAccountNumber(), externalRequest.getMessage());
+        TransactionInfo transactionInfo = accountService.receiverMoneyFromExternalBank(partnerInfo.getPartnerName(), requestMessage.getFromAccountNumber(), requestMessage.getAmount(), "", requestMessage.getAccountNumber(), externalRequest.getMessage());
 
         //Get public key of partner
         //Verify request

@@ -121,7 +121,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public TransactionInfo receiverMoneyFromExternalBank(String fromBank, long amount, String description, long accountNumber, String signature) {
+    public TransactionInfo receiverMoneyFromExternalBank(String fromBank, long fromAccountNumber, long amount, String description, long accountNumber, String signature) {
         Account account = accountRepository.getAccountFullInfoByAccountNumber(accountNumber);
 
         if (account == null) {
@@ -135,6 +135,7 @@ public class AccountServiceImpl implements AccountService {
         transaction.setDescription(description);
         transaction.setType(Constant.TransactionType.TRANSFER);
         transaction.setStatus(Constant.TransactionStatus.SUCCESS);
+        transaction.setFromAccountNumber(fromAccountNumber);
         transaction.setToAccountNumber(account.getAccountNumber());
         transaction.setCreatedAt(new Date());
         transaction.setUpdatedAt(new Date());
