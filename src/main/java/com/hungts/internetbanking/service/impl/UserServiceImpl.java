@@ -392,13 +392,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new EzException("User does not exist");
         }
 
-        Account account = accountRepository.getUserAccountByType(userInfo.getUserId(), Constant.AccountType.SPEND_ACCOUNT);
         Debtor debtor = debtorRepository.getDebtorById(debtId);
         Account receiverAccount = accountRepository.getUserAccountByType(debtor.getUserId(), Constant.AccountType.SPEND_ACCOUNT);
-
-        if (!debtor.getUserId().equals(userInfo.getUserId()) && !debtor.getDebtorAccountNumber().equals(account.getAccountNumber())) {
-            throw new EzException("Debt not belong to user");
-        }
 
         DebtorInfo debtorInfo = debtorMapper.debtorToDebtorInfo(debtor);
         debtorInfo.setReceiverAccountNumber(receiverAccount.getAccountNumber());
