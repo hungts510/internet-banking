@@ -48,7 +48,7 @@ public class Constant {
     public static final class EmailConfig {
         public static final String HOST = "smtp.gmail.com";
         public static final String PORT = "587";
-        public static final String USERNAME = "hungtspubg@gmail.com";
+        public static final String USERNAME = "30bankwnc@gmail.com";
         public static final String PASSWORD = "Tau0biet";
         public static final String SUBJECT_RESET_EMAIL = "Group 30 Internet Banking - Email reset mật khẩu";
         public static final String SUBJECT_TRANSFER_EMAIL = "Group 30 Internet Banking - Xác nhận giao dịch";
