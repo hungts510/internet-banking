@@ -29,7 +29,7 @@ public interface DebtorRepository {
     })
     Debtor getDebtorById(int debtorId);
 
-    @Select("SELECT d.*, r.receiver_name FROM debtor d LEFT JOIN receiver r ON r.receiver_account_number = d.debtor_account_number WHERE d.user_id = #{userId} ORDER BY d.created_at DESC")
+    @Select("SELECT * FROM debtor d WHERE d.user_id = #{userId} ORDER BY d.created_at DESC")
     @Results(
             id = "DebtorInfo", value = {
             @Result(column = "id", property = "id", id = true),
