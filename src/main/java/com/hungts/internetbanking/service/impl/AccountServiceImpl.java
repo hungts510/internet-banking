@@ -344,7 +344,11 @@ public class AccountServiceImpl implements AccountService {
 
         if (accountRequest.getTransactionType().equals(Constant.TransactionType.TRANSFER)) {
             List<Transaction> transactions = transactionRepository.getListTransactionByTypeFromAccount(Constant.TransactionType.TRANSFER, userAccount.getAccountNumber());
-            transactionMetaData.setListTransfers(transactions.stream().map(transaction -> transactionMapper.transactionToTransactionInfo(transaction)).collect(Collectors.toCollection(LinkedList::new)));
+            List<Transaction> transactionsTransfersTo = transactionRepository.getListTransactionByTypeToAccount(Constant.TransactionType.TRANSFER, userAccount.getAccountNumber());
+            List<Transaction> totalTransactions = new ArrayList<>();
+            totalTransactions.addAll(transactions);
+            totalTransactions.addAll(transactionsTransfersTo);
+            transactionMetaData.setListTransfers(totalTransactions.stream().map(transaction -> transactionMapper.transactionToTransactionInfo(transaction)).collect(Collectors.toCollection(LinkedList::new)));
         } else if (accountRequest.getTransactionType().equals(Constant.TransactionType.DEBT)) {
             List<Transaction> transactions = transactionRepository.getListTransactionByTypeFromAccount(Constant.TransactionType.DEBT, userAccount.getAccountNumber());
             transactionMetaData.setListDebts(transactions.stream().map(transaction -> transactionMapper.transactionToTransactionInfo(transaction)).collect(Collectors.toCollection(LinkedList::new)));
@@ -353,7 +357,11 @@ public class AccountServiceImpl implements AccountService {
             transactionMetaData.setListPayIn(transactions.stream().map(transaction -> transactionMapper.transactionToTransactionInfo(transaction)).collect(Collectors.toCollection(LinkedList::new)));
         } else if (accountRequest.getTransactionType().equals(Constant.TransactionType.ALL)) {
             List<Transaction> transactionsTransfers = transactionRepository.getListTransactionByTypeFromAccount(Constant.TransactionType.TRANSFER, userAccount.getAccountNumber());
-            transactionMetaData.setListTransfers(transactionsTransfers.stream().map(transaction -> transactionMapper.transactionToTransactionInfo(transaction)).collect(Collectors.toCollection(LinkedList::new)));
+            List<Transaction> transactionsTransfersTo = transactionRepository.getListTransactionByTypeToAccount(Constant.TransactionType.TRANSFER, userAccount.getAccountNumber());
+            List<Transaction> totalTransactions = new ArrayList<>();
+            totalTransactions.addAll(transactionsTransfers);
+            totalTransactions.addAll(transactionsTransfersTo);
+            transactionMetaData.setListTransfers(totalTransactions.stream().map(transaction -> transactionMapper.transactionToTransactionInfo(transaction)).collect(Collectors.toCollection(LinkedList::new)));
             List<Transaction> transactionsDebts = transactionRepository.getListTransactionByTypeFromAccount(Constant.TransactionType.DEBT, userAccount.getAccountNumber());
             transactionMetaData.setListDebts(transactionsDebts.stream().map(transaction -> transactionMapper.transactionToTransactionInfo(transaction)).collect(Collectors.toCollection(LinkedList::new)));
             List<Transaction> transactionsPayIn = transactionRepository.getListTransactionByTypeToAccount(Constant.TransactionType.PAY_IN, userAccount.getAccountNumber());
